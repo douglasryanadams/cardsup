@@ -1,0 +1,6 @@
+# JetBrains IDE Environment Variables
+.idea/
+# Vim Swap Files
+*.swp
+# Rust Build Directory
+target/

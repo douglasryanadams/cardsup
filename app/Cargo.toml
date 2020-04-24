@@ -1,0 +1,12 @@
+[package]
+name = "scrumpoker"
+version = "1.0.0"
+authors = ["Douglas Adams <douglasryanadams@gmail.com>"]
+edition = "2018"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+tungstenite = "0.10.1"
+log = "0.4.8"
+env_logger = "0.7.1"
