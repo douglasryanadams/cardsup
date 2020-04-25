@@ -20,7 +20,7 @@
             grid-row-end: span 1;
 
             display: grid;
-            grid-template-columns: auto auto auto auto auto auto;
+            grid-template-columns: repeat(12, auto);
             grid-template-rows: auto auto;
             grid-template-areas:
                 "name name name name ticket ticket ticket ticket session session session session"
@@ -35,8 +35,8 @@
             background-color: lightsalmon;
         }
 
-        .name { grid-area: name; }
-        .ticket { grid-area: ticket; }
+        .name { grid-column: name;  }
+        .ticket { grid-area:  ticket}
         .session { grid-area: session; }
         .reset { grid-area: reset; }
         .show { grid-area: show; }
@@ -49,13 +49,9 @@
 
             display: grid;
             grid-template-columns: auto auto auto auto;
-            /* grid-template-rows: 60px 60px 60px; */
-            grid-template-areas:
-                "one two three five"
-                "eight thirteen twentyone thirtyfour"
-                "question impossible spike split";
             column-gap: 4px;
             row-gap: 4px;
+            grid-auto-flow: row;
         }
 
         .card {
@@ -72,19 +68,6 @@
             vertical-align: top;
         }
 
-        .one {grid-area: one;}
-        .two {grid-area: two;}
-        .three {grid-area: three;}
-        .five {grid-area: five;}
-        .eight {grid-area: eight;}
-        .thirteen {grid-area: thirteen;}
-        .twentyone {grid-area: twentyone;}
-        .thirtyfour {grid-area: thirtyfour;}
-        .question {grid-area: question;}
-        .impossible {grid-area: impossible;}
-        .spike {grid-area: spike;}
-        .split {grid-area: split;}
-
     </style>
 </head>
 
@@ -100,20 +83,20 @@
         <div class="databox winner">Winner</div>
     </div>
     <div class="card-wrapper">
-        <div class="card one">1</div>
-        <div class="card two">2</div>
-        <div class="card three">3</div>
-        <div class="card five">5</div>
+        <div class="card">1</div>
+        <div class="card">2</div>
+        <div class="card">3</div>
+        <div class="card">5</div>
 
-        <div class="card eight">8</div>
-        <div class="card thirteen">13</div>
-        <div class="card twentyone">21</div>
-        <div class="card thirtyfour">34</div>
+        <div class="card">8</div>
+        <div class="card">13</div>
+        <div class="card">21</div>
+        <div class="card">34</div>
 
-        <div class="card question">Question</div>
-        <div class="card impossible">Impossible</div>
-        <div class="card spike">Needs a Spike</div>
-        <div class="card split">Split up</div>
+        <div class="card">Question</div>
+        <div class="card">Impossible</div>
+        <div class="card">Needs a Spike</div>
+        <div class="card">Split up</div>
     </div>
 </div>
 <script>
