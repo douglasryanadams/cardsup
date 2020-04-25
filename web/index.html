@@ -1,15 +1,124 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <meta charset="UTF-8">
-  <title>Scrum Poker</title>
+    <meta charset="UTF-8">
+    <title>Scrum Poker</title>
+
+    <style>
+        body {
+            padding: 20px;
+        }
+
+        .body-wrapper {
+            display: grid;
+            grid-template-rows: 120px auto;
+            row-gap: 40px;
+        }
+
+        .metadata {
+            grid-row-start: 1;
+            grid-row-end: span 1;
+
+            display: grid;
+            grid-template-columns: auto auto auto auto auto auto;
+            grid-template-rows: auto auto;
+            grid-template-areas:
+                "name name name name ticket ticket ticket ticket session session session session"
+                "reset reset reset show show show average average average winner winner winner";
+            column-gap: 10px;
+            row-gap: 20px;
+        }
+
+        .databox {
+            text-align: center;
+            border-radius: 0.25rem;
+            background-color: lightsalmon;
+        }
+
+        .name { grid-area: name; }
+        .ticket { grid-area: ticket; }
+        .session { grid-area: session; }
+        .reset { grid-area: reset; }
+        .show { grid-area: show; }
+        .average { grid-area: average; }
+        .winner { grid-area: winner; }
+
+        .card-wrapper {
+            grid-row-start: 2;
+            grid-row-end: span 1;
+
+            display: grid;
+            grid-template-columns: auto auto auto auto;
+            /* grid-template-rows: 60px 60px 60px; */
+            grid-template-areas:
+                "one two three five"
+                "eight thirteen twentyone thirtyfour"
+                "question impossible spike split";
+            column-gap: 4px;
+            row-gap: 4px;
+        }
+
+        .card {
+            text-align: center;
+            background-color: lightblue; /* Debug */
+            border-radius: 0.5rem;
+        }
+
+        /* Popular hack to get squares */
+        .card:before {
+            content: "";
+            padding-bottom: 100%;
+            display: inline-block;
+            vertical-align: top;
+        }
+
+        .one {grid-area: one;}
+        .two {grid-area: two;}
+        .three {grid-area: three;}
+        .five {grid-area: five;}
+        .eight {grid-area: eight;}
+        .thirteen {grid-area: thirteen;}
+        .twentyone {grid-area: twentyone;}
+        .thirtyfour {grid-area: thirtyfour;}
+        .question {grid-area: question;}
+        .impossible {grid-area: impossible;}
+        .spike {grid-area: spike;}
+        .split {grid-area: split;}
+
+    </style>
 </head>
 
 <body>
+<div class="body-wrapper">
+    <div class="metadata">
+        <div class="databox name">Name</div>
+        <div class="databox ticket">Ticket</div>
+        <div class="databox session">Session</div>
+        <div class="databox reset">Reset</div>
+        <div class="databox show">Show</div>
+        <div class="databox average">Average</div>
+        <div class="databox winner">Winner</div>
+    </div>
+    <div class="card-wrapper">
+        <div class="card one">1</div>
+        <div class="card two">2</div>
+        <div class="card three">3</div>
+        <div class="card five">5</div>
 
-  <script>
+        <div class="card eight">8</div>
+        <div class="card thirteen">13</div>
+        <div class="card twentyone">21</div>
+        <div class="card thirtyfour">34</div>
+
+        <div class="card question">Question</div>
+        <div class="card impossible">Impossible</div>
+        <div class="card spike">Needs a Spike</div>
+        <div class="card split">Split up</div>
+    </div>
+</div>
+<script>
     console.info("Loading ...")
     console.info("Loaded")
-  </script>
+</script>
 </body>
 </html>
