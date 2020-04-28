@@ -2,71 +2,151 @@
 <html>
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1">
     <title>Scrum Poker</title>
 
     <style>
         body {
             padding: 20px;
+            font-family: Arial, sans-serif;
         }
 
         .body-wrapper {
             display: grid;
-            grid-template-rows: 120px auto;
-            row-gap: 40px;
+            grid-template-rows: auto auto;
+            row-gap: 0.5rem;
         }
+
+        @media (min-width: 800px) {
+            .body-wrapper {
+                grid-template-rows: auto auto;
+                row-gap: 2rem;
+            }
+        }
+
+        /* Menu At the Top */
+        /* --------------- */
 
         .metadata {
             grid-row-start: 1;
             grid-row-end: span 1;
 
             display: grid;
-            grid-template-columns: repeat(12, auto);
+            grid-template-columns: repeat(12, 1fr);
             grid-template-rows: auto auto;
             grid-template-areas:
-                "name name name name ticket ticket ticket ticket session session session session"
-                "reset reset reset show show show average average average winner winner winner";
-            column-gap: 10px;
-            row-gap: 20px;
+                    "name name name name ticket ticket ticket ticket session session session session"
+                    "reset reset reset show show show average average average winner winner winner";
+            row-gap: 0.5rem;
         }
 
         .databox {
             text-align: center;
-            border-radius: 0.25rem;
-            background-color: lightsalmon;
+            padding: 1em;
         }
+
 
         .name { grid-column: name;  }
         .ticket { grid-area:  ticket}
         .session { grid-area: session; }
-        .reset { grid-area: reset; }
-        .show { grid-area: show; }
+        .reset {
+            grid-area: reset;
+            background-color: lightcoral;
+        }
+        .show {
+            grid-area: show;
+            background: lightgreen;
+            border-left: 1px solid darkred;
+        }
         .average { grid-area: average; }
         .winner { grid-area: winner; }
+
+        .form-data {
+            font-weight: bold;
+        }
+
+        #username {
+            text-align: left;
+        }
+
+        #ticket-number-value {
+            font-size: 1.5em;
+        }
+
+        #session {
+            text-align: right;
+        }
+
+        @media(min-width: 800px) {
+
+
+            .metadata {
+                column-gap: 1rem;
+                row-gap: 1rem;
+            }
+
+            .databox {
+                border-radius: 0.5em;
+            }
+
+            .show {
+                border: none;
+            }
+
+            .action-button {
+                box-shadow: 0.1rem 0.15rem lightgray;
+            }
+
+            .form-data {
+                font-size: 1.2em;
+            }
+
+            #ticket-number-value {
+                font-size: 2em;
+            }
+        }
+
+
+        /* Cards */
+        /* ----- */
 
         .card-wrapper {
             grid-row-start: 2;
             grid-row-end: span 1;
 
             display: grid;
-            grid-template-columns: auto auto auto auto;
-            column-gap: 4px;
-            row-gap: 4px;
+            grid-template-columns: 1fr 1fr;
+            grid-gap: 0.1rem;
             grid-auto-flow: row;
         }
 
         .card {
             text-align: center;
             background-color: lightblue; /* Debug */
-            border-radius: 0.5rem;
+            padding: 1rem 0;
+            font-size: 2em;
+            font-weight: bold;
         }
 
-        /* Popular hack to get squares */
-        .card:before {
-            content: "";
-            padding-bottom: 100%;
-            display: inline-block;
-            vertical-align: top;
+        .metadata-value {
+            font-weight: bold;
+            font-style: italic;
+            font-size: 1.2em;
         }
+
+        @media (min-width: 800px) {
+            .card-wrapper {
+                grid-template-columns: 1fr 1fr 1fr 1fr;
+                grid-gap: 2rem;
+            }
+
+            .card {
+                border-radius: 0.5rem;
+                font-size: 3em;
+                padding: 3em 0.5em;
+            }
+        }
+
 
     </style>
 </head>
@@ -74,13 +154,27 @@
 <body>
 <div class="body-wrapper">
     <div class="metadata">
-        <div class="databox name">Name</div>
-        <div class="databox ticket">Ticket</div>
-        <div class="databox session">Session</div>
-        <div class="databox reset">Reset</div>
-        <div class="databox show">Show</div>
-        <div class="databox average">Average</div>
-        <div class="databox winner">Winner</div>
+        <div id="username" class="databox form-data name">
+            <span id="username-value" class="databox-value">Grooming</span>
+        </div>
+        <div id="ticket-number" class="databox form-data ticket">
+            <span id="ticket-number-value" class="databox-value">ABC-1234</span>
+        </div>
+        <div id="session" class="databox form-data session">
+            <span id="session-value" class="databox-value">ASLB431AS</span>
+        </div>
+
+        <div class="databox action-button reset">Reset</div>
+        <div class="databox action-button show">Show</div>
+
+        <div class="databox info-box average">
+            Average:
+            <span id="average-value" class="metadata-value">6</span>
+        </div>
+        <div class="databox info-box winner">
+            Winner:
+            <span id="winner-value" class="metadata-value">8</span>
+        </div>
     </div>
     <div class="card-wrapper">
         <div class="card">1</div>
@@ -93,10 +187,10 @@
         <div class="card">21</div>
         <div class="card">34</div>
 
-        <div class="card">Question</div>
-        <div class="card">Impossible</div>
-        <div class="card">Needs a Spike</div>
-        <div class="card">Split up</div>
+        <div class="card">?</div>
+        <div class="card">!</div>
+        <div class="card">-^-</div>
+        <div class="card">-/-</div>
     </div>
 </div>
 <script>
