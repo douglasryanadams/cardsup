@@ -1,5 +1,22 @@
+/*
+This theme's colors are taken from the popular Vim theme: 'Gruvbox'
+https://github.com/morhetz/gruvbox
+ */
+
+:root {
+    /* Shared colors */
+    --red: #cc241d;
+    --green: #98971a;
+    --yellow: #d79921;
+    --blue: #458588;
+    --purple: #b16286;
+    --aqua: #689d6a;
+    --orange: #d65d0e;
+}
+
 body {
     padding: 19px;
-    font-family: Arial, sans-serif;
-    background-color: whitesmoke;
+    background-color: var(--background);
+    color: var(--foreground);
+    font-family: 'Open Sans', Arial, sans-serif;
 }

@@ -1,0 +1,14 @@
+/* Ref: https://github.com/morhetz/gruvbox */
+:root {
+    --background: #282828;
+    --foreground: #ebdbb2;
+    --gray-primary: #a89984;
+    --gray-secondary: #928374;
+    --secondary-red: #fb4934;
+    --secondary-green: #b8bbd26;
+    --secondary-yellow: #fabd2f;
+    --secondary-blue: #83a598;
+    --secondary-purple: #d3869b;
+    --secondary-aqua: #8ec07c;
+    --secondary-orange: #fe8019;
+}

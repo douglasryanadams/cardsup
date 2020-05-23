@@ -4,200 +4,78 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1">
     <title>Scrum Poker</title>
+    <!-- TODO: Download fonts from Google Fonts-->
 
-    <link rel="stylesheet" href="style/global.css">
-    <style>
+    <!-- font-family: 'Lilita One', cursive; -->
+    <link href="https://fonts.googleapis.com/css2?family=Lilita+One&display=swap" rel="stylesheet">
 
-        .body-wrapper {
-            display: grid;
-            grid-template-rows: repeat(3, auto);
-            row-gap: 0.5rem;
+    <!-- font-family: 'Open Sans', sans-serif; -->
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans&display=swap" rel="stylesheet">
+
+
+    <link rel="stylesheet" type="text/css" href="style/dark-theme.css">
+    <link rel="stylesheet" type="text/css" href="style/global.css">
+    <style rel="stylesheet" type="text/css">
+        /* Placeholder */
+        #header {
+            font-size: 1.8em;
+            font-family: 'Lilita One', Arial, sans-serif;
+            margin-bottom: 30px;
         }
-
-        @media (min-width: 800px) {
-            .body-wrapper {
-                row-gap: 2rem;
-            }
-        }
-
-        /* Menu At the Top */
-        /* --------------- */
-
-        .metadata {
-            grid-row-start: 1;
-            grid-row-end: span 1;
-
-            display: grid;
-            grid-template-columns: repeat(12, 1fr);
-            grid-template-rows: auto auto;
-            grid-template-areas:
-                    ". . . . ticket ticket ticket ticket . . . ."
-                    "reset reset reset show show show average average average winner winner winner";
-            row-gap: 0.5rem;
-        }
-
-        .databox {
-            text-align: center;
-            padding: 1em;
-        }
-
-        .action-button {
-            background-color: white;
-            box-shadow: 1px 1px #333;
-            border: 1px solid darkgray;
-            font-weight: bold;
-        }
-
-
-        .ticket { grid-area:  ticket}
-        .reset {
-            grid-area: reset;
-        }
-        .show {
-            grid-area: show;
-        }
-        .average { grid-area: average; }
-        .winner { grid-area: winner; }
-
-        .form-data {
-            font-weight: bold;
-        }
-
-        #ticket-number-value {
-            font-size: 1.5em;
-        }
-
-        @media(min-width: 800px) {
-
-
-            .metadata {
-                column-gap: 1rem;
-                row-gap: 3rem;
-            }
-
-            .databox {
-                font-size: 1.5em;
-            }
-
-            .action-button {
-                box-shadow: 0.25rem 0.25rem #333;
-            }
-
-            .form-data {
-                font-size: 1.2em;
-            }
-
-            #ticket-number-value {
-                font-size: 2em;
-            }
-        }
-
-
-        /* Cards */
-        /* ----- */
-
-        .card-wrapper {
-            grid-row-start: 2;
-            grid-row-end: span 1;
-
-            display: grid;
-            grid-template-columns: 1fr 1fr 1fr;
-            grid-gap: 0.1rem;
-            grid-auto-flow: row;
-        }
-
-        .card {
-            text-align: center;
-            background-color: white; /* Debug */
-            border: 1px solid darkgray;
-            box-shadow: 2px 2px black;
-            padding: 1rem 0;
-
-            font-size: 2em;
-            font-weight: bold;
-        }
-
-        .metadata-value {
+        #welcome {
             font-weight: bold;
             font-style: italic;
-            font-size: 1.2em;
-        }
-
-        @media (min-width: 800px) {
-            .card-wrapper {
-                grid-template-columns: 1fr 1fr 1fr 1fr;
-                /*grid-gap: .25rem;*/
-            }
-
-            .card {
-                border-radius: 0;
-                box-shadow: 0.1rem 0.1rem #333;
-                margin: 0;
-                font-size: 6em;
-                padding: 1em 0.5em;
-            }
-        }
-
-        .footer {
-            font-size: 1.2em;
-        }
-
-        #session {
             text-align: right;
+            display: inline-block;
+        }
+
+        #welcome > #w-welcome {
+            font-size: 1.4em;
+        }
+
+        #sub-welcome {
+            font-size: 0.6em;
             font-style: italic;
         }
-
-        @media (min-width: 800px) {
-            .footer {
-                font-size: 2em;
-            }
-        }
-
-
 
     </style>
 </head>
-
 <body>
-<div class="body-wrapper">
-    <div class="metadata">
-        <div id="ticket-number" class="databox form-data ticket">
-            <span id="ticket-number-value" class="databox-value">ABC-1234</span>
-        </div>
-
-        <div class="databox action-button reset">Reset</div>
-        <div class="databox action-button show">Show</div>
-
-        <div class="databox info-box average">
-            Average:
-            <span id="average-value" class="metadata-value">6</span>
-        </div>
-        <div class="databox info-box winner">
-            Winner:
-            <span id="winner-value" class="metadata-value">8</span>
+<div id="body-wrapper">
+    <div id="header">
+        <div id="welcome">
+            <span id="w-welcome">W</span>ELCOME
+            <div id="sub-welcome">
+                to <span id="scrum-poker-title">Scrum Poker!</span>
+            </div>
         </div>
     </div>
-    <div class="card-wrapper">
-        <div class="card">1</div>
-        <div class="card">2</div>
-        <div class="card">3</div>
-        <div class="card">5</div>
 
-        <div class="card">8</div>
-        <div class="card">13</div>
-        <div class="card">21</div>
-        <div class="card">34</div>
-
-        <div class="card">?</div>
-        <div class="card">!</div>
-        <div class="card">-^-</div>
-        <div class="card">-/-</div>
-    </div>
-    <div class="footer">
-        <div id="session" class="session">
-<!--            TODO: Make this clickable to copy -->
-            <span id="session-value" class="databox-value">ASLB431AS</span>
+    <div id="content">
+        <div id="join-form-wrapper">
+            Join an existing Session:
+            <form id="join-from" action="/api/join" method="get">
+                <input id="join-session-id" type="text" autocomplete="session-name" name="session-id"
+                       placeholder="ECTO-1">
+                <label for="join-session-id">Session Name</label>
+                <input id="join-my-name" type="text" autocomplete="name" name="join-name" placeholder="Peter Venkman">
+                <label for="join-my-name">My Name</label>
+                <button type="submit" name="join-button">join</button>
+            </form>
         </div>
+        <div id="create-form-wrapper">
+            Create a new Session:
+            <form id="create-from" action="/api/create" method="get">
+                <input id="create-session-name" type="text" autocomplete="session-name" name="session-name"
+                       placeholder="Estimation Time!">
+                <label for="create-session-name">Session Name</label>
+                <button type="submit" name="create-button">Create</button>
+            </form>
+        </div>
+    </div>
+
+    <div id="footer">
+        <!-- TODO: Add link to license and e-mail address admin@builtonbits.com -->
     </div>
 </div>
 <script>

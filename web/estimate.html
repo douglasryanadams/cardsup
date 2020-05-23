@@ -3,13 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1">
-    <title>Scrum Poker</title>
+    <title>Scrum Poker - Estimate</title>
 
-    <style>
+    <!-- TODO: Download fonts from Google Fonts-->
+
+    <!-- font-family: 'Lilita One', cursive; -->
+    <link href="https://fonts.googleapis.com/css2?family=Lilita+One&display=swap" rel="stylesheet">
+
+    <!-- font-family: 'Open Sans', sans-serif; -->
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans&display=swap" rel="stylesheet">
+
+
+    <link rel="stylesheet" type="text/css" href="style/dark-theme.css">
+    <link rel="stylesheet" type="text/css" href="style/global.css">
+    <style rel="stylesheet" type="text/css">
         body {
             padding: 20px;
-            font-family: Arial, sans-serif;
-            background-color: whitesmoke;
         }
 
         .body-wrapper {
@@ -38,6 +47,8 @@
                     ". . . . ticket ticket ticket ticket . . . ."
                     "reset reset reset show show show average average average winner winner winner";
             row-gap: 0.5rem;
+
+            color: var(--foreground)
         }
 
         .databox {
@@ -46,19 +57,25 @@
         }
 
         .action-button {
-            background-color: white;
+            background-color: var(--foreground);
             box-shadow: 1px 1px #333;
-            border: 1px solid darkgray;
+            border: 1px solid var(--gray-primary);
             font-weight: bold;
+
+            color: var(--background)
         }
 
 
         .ticket { grid-area:  ticket}
         .reset {
             grid-area: reset;
+            background-color: var(--red);
+            color: var(--secondary-yellow);
         }
         .show {
             grid-area: show;
+            background-color: var(--green);
+            color: var(--secondary-green);
         }
         .average { grid-area: average; }
         .winner { grid-area: winner; }
@@ -69,6 +86,7 @@
 
         #ticket-number-value {
             font-size: 1.5em;
+            font-family: 'Lilita One', Arial, sans-serif;
         }
 
         @media(min-width: 800px) {
@@ -112,13 +130,16 @@
 
         .card {
             text-align: center;
-            background-color: white; /* Debug */
-            border: 1px solid darkgray;
+            background-color: var(--foreground); /* Debug */
+            border: 1px solid var(--gray-secondary);
             box-shadow: 2px 2px black;
             padding: 1rem 0;
 
             font-size: 2em;
             font-weight: bold;
+            font-family: 'Lilita One', Arial, sans-serif;
+
+            color: var(--background);
         }
 
         .metadata-value {
@@ -144,6 +165,7 @@
 
         .footer {
             font-size: 1.2em;
+            color: var(--foreground);
         }
 
         #session {
