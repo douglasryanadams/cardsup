@@ -18,10 +18,11 @@
     <style rel="stylesheet" type="text/css">
         /* Placeholder */
         #header {
-            font-size: 1.8em;
+            font-size: 2.8em;
             font-family: 'Lilita One', Arial, sans-serif;
             margin-bottom: 30px;
         }
+
         #welcome {
             font-weight: bold;
             font-style: italic;
@@ -38,6 +39,34 @@
             font-style: italic;
         }
 
+        #content {
+            text-align: right;
+        }
+
+        #content-right {
+            display: inline-block;
+            text-align: left;
+            margin-right: 2em;
+        }
+
+        .input-text {
+            margin-left: 0;
+        }
+
+        .button-submit {
+            margin-left: 0;
+        }
+
+        .form-row {
+            display: flex;
+            flex-direction: row;
+            flex-wrap: wrap;
+        }
+
+        .form-element {
+            align-self: center;
+        }
+
     </style>
 </head>
 <body>
@@ -52,25 +81,53 @@
     </div>
 
     <div id="content">
-        <div id="join-form-wrapper">
-            Join an existing Session:
-            <form id="join-from" action="/api/join" method="get">
-                <input id="join-session-id" type="text" autocomplete="session-name" name="session-id"
-                       placeholder="ECTO-1">
-                <label for="join-session-id">Session Name</label>
-                <input id="join-my-name" type="text" autocomplete="name" name="join-name" placeholder="Peter Venkman">
-                <label for="join-my-name">My Name</label>
-                <button type="submit" name="join-button">join</button>
-            </form>
-        </div>
-        <div id="create-form-wrapper">
-            Create a new Session:
-            <form id="create-from" action="/api/create" method="get">
-                <input id="create-session-name" type="text" autocomplete="session-name" name="session-name"
-                       placeholder="Estimation Time!">
-                <label for="create-session-name">Session Name</label>
-                <button type="submit" name="create-button">Create</button>
-            </form>
+        <div id="content-right">
+            <div id="join-form-wrapper">
+                <strong>Join an existing Session:</strong>
+                <form id="join-from" action="/api/join" method="get">
+                    <div class="form-row">
+                        <input id="join-session-id"
+                               class="input-text form-element"
+                               type="text"
+                               autocomplete="session-name"
+                               name="session-id"
+                               placeholder="ECTO-1">
+                        <label for="join-session-id" class="form-element">Session Name</label>
+                    </div>
+                    <div class="form-row">
+                        <input id="join-my-name"
+                               class="input-text form-element"
+                               type="text"
+                               autocomplete="name"
+                               name="join-name"
+                               placeholder="Peter Venkman">
+                        <label for="join-my-name" class="form-element">My Name</label>
+                    </div>
+                    <div class="form-row">
+                        <button type="submit" class="button-submit" name="join-button">Join</button>
+                    </div>
+                </form>
+            </div>
+            <div style="height: 30px;">&nbsp;</div>
+            <div id="create-form-wrapper">
+                <strong>Create a new Session:</strong>
+                <form id="create-from" action="/api/create" method="get">
+                    <div class="form-row">
+                        <input id="create-session-name"
+                               class="input-text form-element"
+                               type="text"
+                               autocomplete="session-name"
+                               name="session-name"
+                               placeholder="Estimation Time!">
+                        <label for="create-session-name" class="form-element">Session Name</label>
+                    </div>
+                    <div class="form-row">
+
+                        <button type="submit" class="button-submit" name="create-button">Create</button>
+                    </div>
+                </form>
+            </div>
+
         </div>
     </div>
 

@@ -20,3 +20,24 @@ body {
     color: var(--foreground);
     font-family: 'Open Sans', Arial, sans-serif;
 }
+
+.input-text {
+    padding: 0.4em 0.8em;
+    margin: 0.8em 0.4em;
+    border: none;
+    border-radius: 0.25em;
+    font-size: 1em;
+}
+
+.button-submit {
+    display: inline-block;
+    padding: 0.4em 0.8em;
+    cursor: pointer;
+    border: none;
+    border-radius: 0.25em;
+    text-decoration: none;
+    background: var(--foreground);
+    color: var(--background);
+    font-family: 'Lilita One', Arial, sans-serif;
+    font-size: 1.2em;
+}
