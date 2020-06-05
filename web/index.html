@@ -37,34 +37,66 @@
         #sub-welcome {
             font-size: 0.6em;
             font-style: italic;
+            font-weight: lighter;
         }
 
-        #content {
-            text-align: right;
-        }
-
-        #content-right {
-            display: inline-block;
-            text-align: left;
-            margin-right: 2em;
-        }
 
         .input-text {
             margin-left: 0;
+            margin-right: 0;
         }
 
-        .button-submit {
-            margin-left: 0;
+        .form-element {
+            display: inline-block;
         }
 
         .form-row {
             display: flex;
-            flex-direction: row;
+            flex-direction: column;
             flex-wrap: wrap;
         }
 
-        .form-element {
-            align-self: center;
+        .button-submit {
+            margin-top: 1em;
+            margin-left: 0;
+            margin-right: 0;
+            width: 50%;
+        }
+
+
+        @media (min-width: 800px) {
+            #content {
+                text-align: right;
+            }
+
+            #content-right {
+                display: inline-block;
+                text-align: left;
+                margin-right: 2em;
+            }
+
+            .input-text {
+                margin-left: 0;
+                margin-right: 0.8em;
+            }
+
+            .form-row {
+                flex-direction: row;
+            }
+
+            .form-element {
+                align-self: center;
+            }
+
+            .vert-gap {
+                padding-top: 20px;
+            }
+
+            .button-submit {
+                margin-top: .5em;
+                width: auto;
+            }
+
         }
 
     </style>
@@ -108,7 +140,7 @@
                     </div>
                 </form>
             </div>
-            <div style="height: 30px;">&nbsp;</div>
+            <div class="vert-gap">&nbsp;</div>
             <div id="create-form-wrapper">
                 <strong>Create a new Session:</strong>
                 <form id="create-from" action="/api/create" method="get">
