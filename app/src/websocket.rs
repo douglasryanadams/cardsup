@@ -6,7 +6,7 @@ use log::{warn};
 use std::fmt;
 
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 pub enum MessageAction {
     CreateSession,
     JoinSession,
@@ -19,6 +19,14 @@ pub struct MessageHeader {
     user_id: uuid::Uuid,
 }
 
+impl PartialEq for MessageHeader {
+    fn eq(&self, other: &Self) -> bool {
+        self.action == other.action &&
+            self.session_id == other.session_id &&
+            self.user_id == other.user_id
+    }
+}
+
 #[derive(Debug, Serialize, Deserialize)]
 struct MessageHeaderJson {
     action: String,
@@ -27,8 +35,8 @@ struct MessageHeaderJson {
 }
 
 impl fmt::Display for MessageHeaderJson {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result{
-        write!(f, "action={};session_id={},user_id={};", self.action, self.session_id, self.user_id)
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "action={};session_id={};user_id={};", self.action, self.session_id, self.user_id)
     }
 }
 
@@ -43,6 +51,7 @@ pub struct JoinSessionMessage {
     user_name: String,
 }
 
+#[derive(Debug)]
 pub struct ParseMessageError {
     message: String
 }
@@ -57,7 +66,6 @@ impl fmt::Display for ParseMessageError {
 ///
 /// Personal Note: This is on of my first implementations of a Rust method.
 pub fn parse_header(message: &Message) -> Result<MessageHeader, ParseMessageError> {
-
     let message_string = message.to_string();
     let header_json: MessageHeaderJson;
     match serde_json::from_str(&message_string) {
@@ -98,21 +106,56 @@ pub fn parse_header(message: &Message) -> Result<MessageHeader, ParseMessageErro
 
 #[cfg(test)]
 mod tests {
-    use log::{debug};
     use super::*;
+
+    fn get_message_json(user_id: Option<String>) -> MessageHeaderJson {
+        let message_instance = MessageHeaderJson {
+            action: String::from("create_session"),
+            session_id: String::from("ECTO-1"),
+            user_id: user_id.unwrap_or(String::from("683d711e-fe25-443c-8102-43d4245a6884")),
+        };
+        message_instance
+    }
+
+
+    fn get_message_from_json(message_instance: &MessageHeaderJson) -> Message {
+        let message_instance_string = serde_json::to_string(message_instance).unwrap();
+        return Message::Text(message_instance_string);
+    }
+
 
     /// Tests the "happy path" with a valid request body
     #[test]
     fn test_parse_header() {
+        let message_instance = get_message_json(None);
+        let message = get_message_from_json(&message_instance);
 
-        let message_instance = MessageHeaderJson {
-            action: String::from("create_session"),
+        let expected = MessageHeader {
+            action: MessageAction::CreateSession,
             session_id: String::from("ECTO-1"),
-            user_id: String::from("683d711e-fe25-443c-8102-43d4245a6884"),
+            user_id: Uuid::parse_str("683d711e-fe25-443c-8102-43d4245a6884").unwrap(),
         };
-        debug!("message_instance={};", message_instance);
-        let message_instance_string = serde_json::to_string(&message_instance).unwrap();
-        debug!("message_instance_string={};", message_instance_string);
+
+        let actual = parse_header(&message).unwrap();
+        assert_eq!(expected, actual);
+    }
+
+
+    /// Tests that we get the appropriate Error from a malformed JSON String
+    #[test]
+    #[should_panic]
+    fn test_parse_header_bad_json() {
+        let message = Message::Text(String::from("{ bad json"));
+        parse_header(&message).unwrap();
+    }
+
+    /// Tests that we get the appropriate Error from a malformed UUID for user_id
+    #[test]
+    #[should_panic]
+    fn test_parse_header_bad_user_id() {
+        let message_instance = get_message_json(Some(String::from("baduuid")));
+        let message = get_message_from_json(&message_instance);
+        parse_header(&message).unwrap();
     }
 }
 
