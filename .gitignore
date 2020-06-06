@@ -4,3 +4,7 @@
 *.swp
 # Rust Build Directory
 target/
+# Logs from Nginx
+logs/
+# Mac Index File
+.DS_Store

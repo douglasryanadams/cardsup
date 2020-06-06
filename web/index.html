@@ -124,7 +124,7 @@
                                autocomplete="session-name"
                                name="session-id"
                                placeholder="ECTO-1">
-                        <label for="join-session-id" class="form-element">Session Name</label>
+                        <label for="join-session-id" class="form-element">Session ID</label>
                     </div>
                     <div class="form-row">
                         <input id="join-my-name"
@@ -168,8 +168,31 @@
     </div>
 </div>
 <script>
-    console.info("Loading ...")
-    console.info("Loaded")
+const loc = window.location
+let ws_url;
+if (loc.protocol === "https:") {
+    ws_url = "wss:";
+} else {
+    ws_url = "ws:";
+}
+ws_url += "//" + loc.host;
+ws_url += loc.pathname + "/socket/";
+
+const SOCKET_ADDRESS = ws_url;
+
+console.info("Connecting to Web Socket: " + SOCKET_ADDRESS)
+const socket = new WebSocket(SOCKET_ADDRESS)
+
+// Testing
+socket.onopen = function(event) {
+  let msg = "Test Message"
+  console.debug("   --> " + msg)
+  socket.send(msg)
+}
+socket.onmessage = function(event) {
+  let msg = event.data
+  console.debug("  <-- " + msg)
+}
 </script>
 </body>
 </html>
