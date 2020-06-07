@@ -11,7 +11,7 @@ use log::{info, debug};
 use std::{env, process};
 use std::collections::HashMap;
 use crate::socket_manager::SocketManager;
-use crate::message::{MessageAction, MessageHeader};
+use crate::message::{MessageAction, MessageHeader, ResponseJsonString};
 // use std::collections::HashMap;
 
 fn main() {
@@ -54,11 +54,12 @@ fn main() {
                     Some(message) => {
                         let message_string = message.to_string();
                         debug!("  ->> received message: {}", message_string);
+
                         let header: MessageHeader;
                         match message::parse_header(&message) {
                             Ok(message_header) => header = message_header,
                             Err(error) => {
-                                socket_manager.send_message(format!("{}", error));
+                                socket_manager.send_message(error.get_response_json_string());
                                 continue;
                             }
                         };

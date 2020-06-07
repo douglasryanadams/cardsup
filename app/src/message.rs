@@ -12,19 +12,11 @@ pub(crate) enum MessageAction {
     JoinSession,
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 pub(crate) struct MessageHeader {
     pub(crate) action: MessageAction,
     session_id: String,
     user_id: uuid::Uuid,
-}
-
-impl PartialEq for MessageHeader {
-    fn eq(&self, other: &Self) -> bool {
-        self.action == other.action &&
-            self.session_id == other.session_id &&
-            self.user_id == other.user_id
-    }
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -40,6 +32,33 @@ impl fmt::Display for MessageHeaderJson {
     }
 }
 
+#[derive(Debug, PartialEq, Serialize, Deserialize)]
+struct ResponseMessageJson {
+    status_code: u16,
+    status: String,
+    message: String,
+}
+
+pub(crate) trait ResponseJsonString {
+    fn get_message(&self) -> String;
+
+    fn get_response_json_string(&self) -> String {
+        let response_json = ResponseMessageJson {
+            status_code: 400,
+            status: String::from("bad_request"),
+            message: self.get_message(),
+        };
+        return match serde_json::to_string(&response_json) {
+            Ok(msg) => msg,
+            Err(error) => {
+                warn!("Failed to turn response into JSON String!");
+                self.get_message()
+            }
+        };
+    }
+}
+
+
 pub(crate) struct CreateSessionMessage {
     header: MessageHeader,
     session_name: String,
@@ -51,14 +70,21 @@ pub(crate) struct JoinSessionMessage {
     user_name: String,
 }
 
+
 #[derive(Debug)]
 pub(crate) struct ParseMessageError {
     message: String
 }
 
+impl ResponseJsonString for ParseMessageError {
+    fn get_message(&self) -> String {
+        return format!("Error parsing message: {}", self.message);
+    }
+}
+
 impl fmt::Display for ParseMessageError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "Error parsing message: {}", self.message)
+        write!(f, "{}", self.get_message())
     }
 }
 
@@ -68,9 +94,8 @@ impl fmt::Display for ParseMessageError {
 /// Personal Note: This is on of my first implementations of a Rust method.
 pub(crate) fn parse_header(message: &Message) -> Result<MessageHeader, ParseMessageError> {
     let message_string = message.to_string();
-    let header_json: MessageHeaderJson;
-    match serde_json::from_str(&message_string) {
-        Ok(j) => header_json = j,
+    let header_json: MessageHeaderJson = match serde_json::from_str(&message_string) {
+        Ok(j) => j,
         Err(_) => {
             debug!("Invalid JSON Format: {}", &message_string);
             return Err(ParseMessageError {
@@ -78,12 +103,10 @@ pub(crate) fn parse_header(message: &Message) -> Result<MessageHeader, ParseMess
                 Check for syntax errors.")
             });
         }
-    }
+    };
 
-    let user_id_str;
-
-    match Uuid::parse_str(&header_json.user_id) {
-        Ok(id_str) => user_id_str = id_str,
+    let user_id: Uuid = match Uuid::parse_str(&header_json.user_id) {
+        Ok(id_str) => id_str,
         Err(_) => {
             debug!("Invalid UUID: {}", &header_json.user_id);
             return Err(ParseMessageError {
@@ -91,23 +114,21 @@ pub(crate) fn parse_header(message: &Message) -> Result<MessageHeader, ParseMess
                 valid UUID.")
             });
         }
-    }
+    };
 
     let mut header = MessageHeader {
         action: MessageAction::CreateSession,
         session_id: header_json.session_id,
-        user_id: user_id_str,
+        user_id,
     };
 
-    match header_json.action.as_str() {
-        "create_session" => {
-            header.action = MessageAction::CreateSession
-        }
-        "join_session" => {
-            header.action = MessageAction::JoinSession
-        }
-        _ => warn!("Invalid action received: {:?}", header_json.action)
-    }
+    header.action = match header_json.action.as_str() {
+        "create_session" => MessageAction::CreateSession,
+        "join_session" => MessageAction::JoinSession,
+        _ => return Err(ParseMessageError {
+            message: String::from(format!("Invalid action received: {}", header_json.action))
+        })
+    };
     Ok(header)
 }
 
@@ -173,7 +194,7 @@ mod tests {
     fn test_parse_header_bad_json() {
         let message = Message::Text(String::from("{ bad json"));
         match parse_header(&message) {
-            Ok(_) => panic!("Should have failed"),
+            Ok(_) => assert!(false),
             Err(e) => print!("{}", e)
         }
         // Pass if it reaches here
@@ -185,10 +206,32 @@ mod tests {
         let message_instance = get_message_json(Some(String::from("baduuid")));
         let message = get_message_from_json(&message_instance);
         match parse_header(&message) {
-            Ok(_) => panic!("Should have failed"),
+            Ok(_) => assert!(false),
             Err(e) => print!("{}", e)
         }
         // Pass if it reaches here
+    }
+
+    /// Tests that returning
+    #[test]
+    fn test_get_response_json_string() {
+        let error_message = ParseMessageError {
+            message: String::from("Placeholder Error Message")
+        };
+        let expected = ResponseMessageJson {
+            status_code: 400,
+            status: String::from("bad_request"),
+            message: String::from("Error parsing message: Placeholder Error Message"),
+        };
+        let err_msg_string = error_message.get_response_json_string();
+        let actual: ResponseMessageJson = match serde_json::from_str(&err_msg_string) {
+            Ok(rmj) => rmj,
+            Err(_) => {
+                assert!(false);
+                return;
+            }
+        };
+        assert_eq!(expected, actual);
     }
 }
 
