@@ -8,17 +8,29 @@ use tungstenite::{accept_hdr};
 use tungstenite::handshake::server::{Request, Response};
 
 use log::{info, debug};
+use std::{env, process};
 use std::collections::HashMap;
 use crate::socket_manager::SocketManager;
-use crate::message::MessageAction;
+use crate::message::{MessageAction, MessageHeader};
 // use std::collections::HashMap;
 
 fn main() {
     env_logger::init();
 
-    let server = TcpListener::bind("0.0.0.0:3012").unwrap();
+    let args: Vec<String> = env::args().collect();
+    if args.len() < 2 {
+        println!("Arguments required: cardsup [bind interface IP] [bind port]");
+        process::exit(1);
+    }
+    let interface_ip = &args[1];
+    let port = &args[2];
 
+    let server = TcpListener::bind(format!("{}:{}", interface_ip, port)).unwrap();
+
+    // Create a new thread ('spawn') for each connection that comes in to the server
+    // started above on port 3012.
     for stream in server.incoming() {
+        // TODO Clean up all the .unwrap() calls with real error handling
 
         spawn(move || {
             let callback = |request: &Request, response: Response| {
@@ -42,19 +54,23 @@ fn main() {
                     Some(message) => {
                         let message_string = message.to_string();
                         debug!("  ->> received message: {}", message_string);
-                        // let header = message::parse_header(&message)
-                        //     .unwrap_or_else(|_| {
-                        //         unimplemented!() // TODO
-                        //     });
-                        // debug!("    header constructed: {:?}", header);
-                        //
-                        // Echo
-                        socket_manager.send_message(message_string);
+                        let header: MessageHeader;
+                        match message::parse_header(&message) {
+                            Ok(message_header) => header = message_header,
+                            Err(error) => {
+                                socket_manager.send_message(format!("{}", error));
+                                continue;
+                            }
+                        };
+                        debug!("    header constructed: {:?}", header);
 
-                        // match header.action {
-                        //     MessageAction::CreateSession => {}
-                        //     MessageAction::JoinSession => {}
-                        // }
+                        match header.action {
+                            MessageAction::CreateSession => {}
+                            MessageAction::JoinSession => {}
+                        }
+
+                        // Echo
+                        // socket_manager.send_message(message_string);
                     }
                     None => continue
                 }

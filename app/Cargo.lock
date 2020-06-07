@@ -78,6 +78,18 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "130aac562c0dd69c56b3b1cc8ffd2e17be31d0b6c25b61c96b76231aa23e39e1"
 
 [[package]]
+name = "cardsup"
+version = "1.0.0"
+dependencies = [
+ "env_logger",
+ "log",
+ "serde",
+ "serde_json",
+ "tungstenite",
+ "uuid",
+]
+
+[[package]]
 name = "cc"
 version = "1.0.52"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -455,18 +467,6 @@ checksum = "039c25b130bd8c1321ee2d7de7fde2659fa9c2744e4bb29711cfc852ea53cd19"
 dependencies = [
  "lazy_static",
  "winapi",
-]
-
-[[package]]
-name = "scrumpoker"
-version = "1.0.0"
-dependencies = [
- "env_logger",
- "log",
- "serde",
- "serde_json",
- "tungstenite",
- "uuid",
 ]
 
 [[package]]

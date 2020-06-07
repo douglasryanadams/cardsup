@@ -1,5 +1,5 @@
 [package]
-name = "scrumpoker"
+name = "cardsup"
 version = "1.0.0"
 authors = ["Douglas Adams <admin@builtonbits.com>"]
 edition = "2018"
