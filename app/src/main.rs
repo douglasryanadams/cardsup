@@ -7,7 +7,7 @@ use std::thread::spawn;
 use tungstenite::{accept_hdr};
 use tungstenite::handshake::server::{Request, Response};
 
-use log::{warn, info, debug};
+use log::{info, debug};
 use std::collections::HashMap;
 use crate::socket_manager::SocketManager;
 use crate::message::MessageAction;
@@ -16,12 +16,10 @@ use crate::message::MessageAction;
 fn main() {
     env_logger::init();
 
-    // God Objects
-
-
-    // Application
     let server = TcpListener::bind("0.0.0.0:3012").unwrap();
+
     for stream in server.incoming() {
+
         spawn(move || {
             let callback = |request: &Request, response: Response| {
                 let headers = request.headers();
@@ -37,26 +35,26 @@ fn main() {
             };
 
             let mut websocket = accept_hdr(stream.unwrap(), callback).unwrap();
-            let socket_manager = SocketManager::new(&mut websocket);
+            let mut socket_manager = SocketManager::new(&mut websocket);
 
             loop {
                 match socket_manager.read_message() {
                     Some(message) => {
                         let message_string = message.to_string();
                         debug!("  ->> received message: {}", message_string);
-                        let header = message::parse_header(&message)
-                            .unwrap_or_else(|_| {
-                                unimplemented!() // TODO
-                            });
-                        debug!("    header constructed: {:?}", header);
-
+                        // let header = message::parse_header(&message)
+                        //     .unwrap_or_else(|_| {
+                        //         unimplemented!() // TODO
+                        //     });
+                        // debug!("    header constructed: {:?}", header);
+                        //
                         // Echo
                         socket_manager.send_message(message_string);
 
-                        match header.action {
-                            MessageAction::CreateSession => {}
-                            MessageAction::JoinSession => {}
-                        }
+                        // match header.action {
+                        //     MessageAction::CreateSession => {}
+                        //     MessageAction::JoinSession => {}
+                        // }
                     }
                     None => continue
                 }

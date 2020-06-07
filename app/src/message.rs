@@ -1,10 +1,9 @@
 use serde::{Deserialize, Serialize};
-use tungstenite::{Message, WebSocket};
+use tungstenite::{Message};
 use uuid::Uuid;
 
 use log::{warn, debug};
 use std::fmt;
-use std::net::TcpStream;
 
 
 #[derive(Debug, PartialEq)]

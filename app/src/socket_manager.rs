@@ -3,15 +3,15 @@ use std::net::TcpStream;
 use log::{warn};
 
 pub(crate) struct SocketManager<'a> {
-    socket: &'a WebSocket<TcpStream>
+    socket: &'a mut WebSocket<TcpStream>
 }
 
 impl SocketManager<'_> {
-    pub(crate) fn new(web_socket: & WebSocket<TcpStream>) -> SocketManager {
+    pub(crate) fn new(web_socket: &mut WebSocket<TcpStream>) -> SocketManager {
         return SocketManager { socket: web_socket };
     }
 
-    pub(crate) fn read_message(&self) -> Option<Message> {
+    pub(crate) fn read_message(&mut self) -> Option<Message> {
         match self.socket.read_message() {
             Ok(message) => return Some(message),
             Err(error) => match error {
@@ -27,7 +27,7 @@ impl SocketManager<'_> {
         }
     }
 
-    pub(crate) fn send_message(&self, message_string: String) {
+    pub(crate) fn send_message(&mut self, message_string: String) {
         let message = Message::Text(message_string);
         self.socket.write_message(message);
     }
