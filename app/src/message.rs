@@ -20,7 +20,7 @@ pub fn to_json_string<T: Serialize>(thing: T) -> String {
 }
 
 // --
-// Handling Response Formatting
+// Headers
 // -----
 
 #[derive(Debug, PartialEq, Serialize, Deserialize)]
@@ -29,6 +29,7 @@ struct ResponseHeaderJson {
     status_code: u16,
     status: String,
 }
+
 
 impl fmt::Display for ResponseHeaderJson {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
@@ -69,10 +70,6 @@ impl ErrorResponseJson {
     }
 }
 
-// --
-// Message Headers
-// -----
-
 #[derive(Debug, PartialEq)]
 pub(crate) struct RequestHeader {
     pub(crate) action: MessageAction,
@@ -80,7 +77,7 @@ pub(crate) struct RequestHeader {
     user_id: uuid::Uuid,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, PartialEq, Serialize, Deserialize)]
 struct RequestHeaderJson {
     action: String,
     session_id: String,
@@ -91,6 +88,11 @@ impl fmt::Display for RequestHeaderJson {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(f, "action=<{}>;session_id=<{}>;user_id=<{}>;", self.action, self.session_id, self.user_id)
     }
+}
+
+#[derive(Debug, PartialEq, Serialize, Deserialize)]
+struct GenericRequestWrapperJson {
+    header: RequestHeaderJson
 }
 
 // --
@@ -112,11 +114,19 @@ pub(crate) enum MessageAction {
 // Specific Messages
 // -----
 
+#[derive(Debug, PartialEq)]
 pub(crate) struct CreateSessionMessage {
     header: RequestHeader,
     session_name: String,
 }
 
+#[derive(Debug, PartialEq, Serialize, Deserialize)]
+struct CreateSessionMessageJson {
+    header: RequestHeaderJson,
+    session_name: String,
+}
+
+#[derive(Debug, PartialEq)]
 pub(crate) struct JoinSessionMessage {
     header: RequestHeader,
     session_id: uuid::Uuid,
@@ -140,19 +150,21 @@ impl fmt::Display for ParseMessageError {
 /// Personal Note: This is on of my first implementations of a Rust method.
 pub(crate) fn parse_header(message: &Message) -> Result<RequestHeader, ParseMessageError> {
     let message_string = message.to_string();
-    let header_json: RequestHeaderJson = match serde_json::from_str(&message_string) {
+    let wrapper: GenericRequestWrapperJson = match serde_json::from_str(&message_string) {
         Ok(j) => j,
-        Err(_) => {
+        Err(error) => {
             debug!("Invalid JSON Format: {}", &message_string);
             return Err(
                 ParseMessageError {
-                    message: String::from("Error parsing the string provided \
-                    into a valid JSON Object. \
-                    Check for syntax errors.")
+                    message: format!("Error parsing the string provided \
+                    into expected JSON Object. \
+                    Raw message: <{}>", error)
                 }
             );
         }
     };
+
+    let header_json = wrapper.header;
 
     let user_id: Uuid = match Uuid::parse_str(&header_json.user_id) {
         Ok(id_str) => id_str,
@@ -190,26 +202,30 @@ pub(crate) fn parse_header(message: &Message) -> Result<RequestHeader, ParseMess
 mod tests {
     use super::*;
 
-    fn get_message_json(user_id: Option<String>) -> RequestHeaderJson {
-        let message_instance = RequestHeaderJson {
-            action: String::from("create_session"),
-            session_id: String::from("ECTO-1"),
-            user_id: user_id.unwrap_or(String::from("683d711e-fe25-443c-8102-43d4245a6884")),
+    fn get_message_json(user_id: Option<String>) -> CreateSessionMessageJson {
+        return CreateSessionMessageJson {
+            header: RequestHeaderJson {
+                action: String::from("create_session"),
+                session_id: String::from("ECTO-1"),
+                user_id: user_id.unwrap_or(String::from("683d711e-fe25-443c-8102-43d4245a6884")),
+            },
+            session_name: String::from("Test Session Name"),
         };
-        return message_instance;
     }
 
-
-    fn get_message_from_json(message_instance: &RequestHeaderJson) -> Message {
+    fn get_message_from_json(message_instance: &CreateSessionMessageJson) -> Message {
         let message_instance_string = serde_json::to_string(message_instance).unwrap();
         return Message::Text(message_instance_string);
     }
 
-    fn get_expected() -> RequestHeader {
-        let expected = RequestHeader {
-            action: MessageAction::CreateSession,
-            session_id: String::from("ECTO-1"),
-            user_id: Uuid::parse_str("683d711e-fe25-443c-8102-43d4245a6884").unwrap(),
+    fn get_expected() -> CreateSessionMessage {
+        let expected = CreateSessionMessage {
+            header: RequestHeader {
+                action: MessageAction::CreateSession,
+                session_id: String::from("ECTO-1"),
+                user_id: Uuid::parse_str("683d711e-fe25-443c-8102-43d4245a6884").unwrap(),
+            },
+            session_name: String::from("Test Session Name"),
         };
         return expected;
     }
@@ -220,7 +236,7 @@ mod tests {
         let message_instance = get_message_json(None);
         let message = get_message_from_json(&message_instance);
 
-        let expected = get_expected();
+        let expected = get_expected().header;
         let actual = parse_header(&message).unwrap();
         assert_eq!(expected, actual);
     }
@@ -230,14 +246,16 @@ mod tests {
     fn test_parse_header_extra_keys() {
         let message_instance_string = String::from(r#"
             {
-                "action": "create_session",
-                "session_id": "ECTO-1",
-                "user_id": "683d711e-fe25-443c-8102-43d4245a6884",
-                "unrelated_key": "unused_value"
+                "header" : {
+                    "action": "create_session",
+                    "session_id": "ECTO-1",
+                    "user_id": "683d711e-fe25-443c-8102-43d4245a6884",
+                    "unrelated_key": "unused_value"
+                }
             }"#);
         let message = Message::Text(message_instance_string);
 
-        let expected = get_expected();
+        let expected = get_expected().header;
         let actual = parse_header(&message).unwrap();
         assert_eq!(expected, actual);
     }
@@ -265,6 +283,7 @@ mod tests {
         }
 // Pass if it reaches here
     }
+
 
     /// Tests that returning
     #[test]
