@@ -11,7 +11,7 @@ use log::{info, debug};
 use std::{env, process};
 use std::collections::HashMap;
 use crate::socket_manager::SocketManager;
-use crate::message::{MessageAction, MessageHeader, ResponseJsonString};
+use crate::message::{MessageAction, RequestHeader, ErrorResponseJson, to_json_string};
 // use std::collections::HashMap;
 
 fn main() {
@@ -55,11 +55,13 @@ fn main() {
                         let message_string = message.to_string();
                         debug!("  ->> received message: {}", message_string);
 
-                        let header: MessageHeader;
+                        let header: RequestHeader;
                         match message::parse_header(&message) {
                             Ok(message_header) => header = message_header,
                             Err(error) => {
-                                socket_manager.send_message(error.get_response_json_string());
+                                let error_message = ErrorResponseJson::new_from_parse_message_error(error);
+                                let error_message_string = to_json_string(error_message);
+                                socket_manager.send_message(error_message_string);
                                 continue;
                             }
                         };
@@ -68,6 +70,11 @@ fn main() {
                         match header.action {
                             MessageAction::CreateSession => {}
                             MessageAction::JoinSession => {}
+                            MessageAction::CloseSession => {}
+                            MessageAction::ResetVotes => {}
+                            MessageAction::RevealVotes => {}
+                            MessageAction::SetCurrentLabel => {}
+                            MessageAction::CastVote => {}
                         }
 
                         // Echo

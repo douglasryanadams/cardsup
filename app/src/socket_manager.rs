@@ -29,6 +29,6 @@ impl SocketManager<'_> {
 
     pub(crate) fn send_message(&mut self, message_string: String) {
         let message = Message::Text(message_string);
-        self.socket.write_message(message);
+        self.socket.write_message(message); // TODO Handle error
     }
 }
