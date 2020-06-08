@@ -122,7 +122,7 @@ pub(crate) struct CreateSessionMessage {
 
 #[derive(Debug, PartialEq, Serialize, Deserialize)]
 struct CreateSessionMessageJson {
-    header: RequestHeaderJson,
+    // No need to parse 'header' again here
     session_name: String,
 }
 
@@ -145,6 +145,20 @@ impl fmt::Display for ParseMessageError {
     }
 }
 
+// --
+// Parsing Functions
+// -----
+
+fn get_parse_error(message_string: &String, error: serde_json::Error) -> ParseMessageError {
+    debug!("Invalid JSON Format: {}", &message_string);
+    return ParseMessageError {
+        message: format!("Error parsing the string provided \
+                    into expected JSON Object. \
+                    Raw message: <{}>", error)
+    };
+}
+
+
 /// Takes the websocket message body and extracts the header from the message
 ///
 /// Personal Note: This is on of my first implementations of a Rust method.
@@ -152,16 +166,7 @@ pub(crate) fn parse_header(message: &Message) -> Result<RequestHeader, ParseMess
     let message_string = message.to_string();
     let wrapper: GenericRequestWrapperJson = match serde_json::from_str(&message_string) {
         Ok(j) => j,
-        Err(error) => {
-            debug!("Invalid JSON Format: {}", &message_string);
-            return Err(
-                ParseMessageError {
-                    message: format!("Error parsing the string provided \
-                    into expected JSON Object. \
-                    Raw message: <{}>", error)
-                }
-            );
-        }
+        Err(error) => return Err(get_parse_error(&message_string, error))
     };
 
     let header_json = wrapper.header;
@@ -198,27 +203,50 @@ pub(crate) fn parse_header(message: &Message) -> Result<RequestHeader, ParseMess
     Ok(header)
 }
 
+/// Parse Create Session Message
+pub(crate) fn parse_create_session(message: &Message, request_header: RequestHeader) -> Result<CreateSessionMessage, ParseMessageError> {
+    let message_string = message.to_string();
+    let create_session: CreateSessionMessageJson = match serde_json::from_str(&message_string) {
+        Ok(j) => j,
+        Err(error) => return Err(get_parse_error(&message_string, error))
+    };
+    return Ok(CreateSessionMessage {
+        header: request_header,
+        session_name: create_session.session_name,
+    });
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
 
-    fn get_message_json(user_id: Option<String>) -> CreateSessionMessageJson {
-        return CreateSessionMessageJson {
+    fn get_header_json(user_id: Option<String>) -> GenericRequestWrapperJson {
+        return GenericRequestWrapperJson {
             header: RequestHeaderJson {
                 action: String::from("create_session"),
                 session_id: String::from("ECTO-1"),
                 user_id: user_id.unwrap_or(String::from("683d711e-fe25-443c-8102-43d4245a6884")),
-            },
-            session_name: String::from("Test Session Name"),
+            }
         };
     }
 
-    fn get_message_from_json(message_instance: &CreateSessionMessageJson) -> Message {
+    fn get_create_session_json() -> CreateSessionMessageJson {
+        return CreateSessionMessageJson {
+            session_name: String::from("Test Session Name")
+        };
+    }
+
+    fn get_header_json_message(message_instance: &GenericRequestWrapperJson) -> Message {
         let message_instance_string = serde_json::to_string(message_instance).unwrap();
         return Message::Text(message_instance_string);
     }
 
-    fn get_expected() -> CreateSessionMessage {
+    fn get_create_session_json_message(message_instance: &CreateSessionMessageJson) -> Message {
+        let message_instance_string = serde_json::to_string(message_instance).unwrap();
+        return Message::Text(message_instance_string);
+    }
+
+    fn get_expected_create_session() -> CreateSessionMessage {
         let expected = CreateSessionMessage {
             header: RequestHeader {
                 action: MessageAction::CreateSession,
@@ -233,10 +261,10 @@ mod tests {
     /// Tests the "happy path" with a valid request body
     #[test]
     fn test_parse_header() {
-        let message_instance = get_message_json(None);
-        let message = get_message_from_json(&message_instance);
+        let message_instance = get_header_json(None);
+        let message = get_header_json_message(&message_instance);
 
-        let expected = get_expected().header;
+        let expected = get_expected_create_session().header;
         let actual = parse_header(&message).unwrap();
         assert_eq!(expected, actual);
     }
@@ -255,7 +283,7 @@ mod tests {
             }"#);
         let message = Message::Text(message_instance_string);
 
-        let expected = get_expected().header;
+        let expected = get_expected_create_session().header;
         let actual = parse_header(&message).unwrap();
         assert_eq!(expected, actual);
     }
@@ -269,23 +297,21 @@ mod tests {
             Ok(_) => assert!(false),
             Err(e) => print!("{}", e)
         }
-// Pass if it reaches here
     }
 
     /// Tests that we get the appropriate Error from a malformed UUID for user_id
     #[test]
     fn test_parse_header_bad_user_id() {
-        let message_instance = get_message_json(Some(String::from("baduuid")));
-        let message = get_message_from_json(&message_instance);
+        let message_instance = get_header_json(Some(String::from("baduuid")));
+        let message = get_header_json_message(&message_instance);
         match parse_header(&message) {
             Ok(_) => assert!(false),
             Err(e) => print!("{}", e)
         }
-// Pass if it reaches here
     }
 
 
-    /// Tests that returning
+    /// Tests that returning an error is formatted properly
     #[test]
     fn test_error_response_json_from_parse_message_error() {
         let parse_error_message = ParseMessageError {
@@ -303,6 +329,18 @@ mod tests {
                 return;
             }
         };
+        assert_eq!(expected, actual);
+    }
+
+    /// Tests that we correctly parse a create message
+    #[test]
+    fn test_create_session() {
+        let message_instance = get_create_session_json();
+        let message = get_create_session_json_message(&message_instance);
+
+        let header = get_expected_create_session().header;
+        let expected = get_expected_create_session();
+        let actual = parse_create_session(&message, header).unwrap();
         assert_eq!(expected, actual);
     }
 }

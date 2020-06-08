@@ -11,7 +11,7 @@ use log::{info, debug};
 use std::{env, process};
 use std::collections::HashMap;
 use crate::socket_manager::SocketManager;
-use crate::message::{MessageAction, RequestHeader, ErrorResponseJson, to_json_string};
+use crate::message::{MessageAction, RequestHeader, ErrorResponseJson, to_json_string, parse_create_session};
 // use std::collections::HashMap;
 
 fn main() {
@@ -65,10 +65,13 @@ fn main() {
                                 continue;
                             }
                         };
-                        debug!("    header constructed: {:?}", header);
+                        debug!("    header=<{:?}>;", header);
 
                         match header.action {
-                            MessageAction::CreateSession => {}
+                            MessageAction::CreateSession => {
+                                let create_session = parse_create_session(&message, header);
+                                debug!("    create_session=<{:?}>;", create_session);
+                            }
                             MessageAction::JoinSession => {}
                             MessageAction::CloseSession => {}
                             MessageAction::ResetVotes => {}
