@@ -1,5 +1,5 @@
 mod socket_manager;
-mod message;
+mod messages;
 
 use std::net::TcpListener;
 use std::thread::spawn;
@@ -10,8 +10,11 @@ use tungstenite::handshake::server::{Request, Response};
 use log::{info, debug};
 use std::{env, process};
 use std::collections::HashMap;
+
 use crate::socket_manager::SocketManager;
-use crate::message::{MessageAction, RequestHeader, ErrorResponseJson, to_json_string, parse_create_session};
+use crate::messages::MessageAction;
+use crate::messages::headers::{RequestHeader};
+use crate::messages::error_response::ErrorResponseJson;
 // use std::collections::HashMap;
 
 fn main() {
@@ -56,20 +59,20 @@ fn main() {
                         debug!("  ->> received message: {}", message_string);
 
                         let header: RequestHeader;
-                        match message::parse_header(&message) {
+                        match messages::headers::parse_header(&message) {
                             Ok(message_header) => header = message_header,
                             Err(error) => {
                                 let error_message = ErrorResponseJson::new_from_parse_message_error(error);
-                                let error_message_string = to_json_string(error_message);
+                                let error_message_string = messages::to_json_string(error_message);
                                 socket_manager.send_message(error_message_string);
                                 continue;
                             }
                         };
                         debug!("    header=<{:?}>;", header);
 
-                        match header.action {
+                        match header.get_action() {
                             MessageAction::CreateSession => {
-                                let create_session = parse_create_session(&message, header);
+                                let create_session = messages::create_session::parse_create_session(&message, header);
                                 debug!("    create_session=<{:?}>;", create_session);
                             }
                             MessageAction::JoinSession => {}
