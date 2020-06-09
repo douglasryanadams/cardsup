@@ -1,24 +1,32 @@
 mod socket_manager;
 mod messages;
-
-use std::net::TcpListener;
-use std::thread::spawn;
-
-use tungstenite::{accept_hdr};
-use tungstenite::handshake::server::{Request, Response};
-
-use log::{info, debug};
-use std::{env, process};
-use std::collections::HashMap;
+mod session_manager;
+mod user;
 
 use crate::socket_manager::SocketManager;
 use crate::messages::MessageAction;
 use crate::messages::headers::{RequestHeader};
 use crate::messages::error_response::ErrorResponseJson;
-// use std::collections::HashMap;
+use crate::session_manager::PokerSession;
+use crate::user::User;
+
+use std::net::TcpListener;
+use std::thread::spawn;
+use std::{env, process};
+use std::collections::HashMap;
+
+use tungstenite::{accept_hdr};
+use tungstenite::handshake::server::{Request, Response};
+
+use log::{info, debug};
+use uuid::Uuid;
 
 fn main() {
     env_logger::init();
+
+    let sessions: HashMap<String, PokerSession> = HashMap::new();
+    let users: HashMap<Uuid, User> = HashMap::new();
+
 
     let args: Vec<String> = env::args().collect();
     if args.len() < 2 {
@@ -35,6 +43,7 @@ fn main() {
     for stream in server.incoming() {
         // TODO Clean up all the .unwrap() calls with real error handling
 
+        // Starts a thread for each connection that's established
         spawn(move || {
             let callback = |request: &Request, response: Response| {
                 let headers = request.headers();
@@ -52,6 +61,7 @@ fn main() {
             let mut websocket = accept_hdr(stream.unwrap(), callback).unwrap();
             let mut socket_manager = SocketManager::new(&mut websocket);
 
+            // Main event loop that handles messages and dispatches to different business logic depending on the message type
             loop {
                 match socket_manager.read_message() {
                     Some(message) => {
