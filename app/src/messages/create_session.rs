@@ -6,8 +6,8 @@ use serde::{Serialize, Deserialize};
 
 #[derive(Debug, PartialEq)]
 pub(crate) struct CreateSessionMessage {
-    header: RequestHeader,
-    session_name: String,
+    pub(crate) header: RequestHeader,
+    pub(crate) session_name: String,
 }
 
 #[derive(Debug, PartialEq, Serialize, Deserialize)]

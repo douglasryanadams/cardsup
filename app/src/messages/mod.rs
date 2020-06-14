@@ -1,6 +1,6 @@
-use serde::Serialize;
 use core::fmt;
-use log::{warn};
+use log::{debug, warn};
+use serde::{Serialize, Deserialize};
 pub mod headers;
 pub mod create_session;
 pub mod error_response;
@@ -11,6 +11,7 @@ pub fn to_json_string<T: Serialize>(thing: T) -> String {
         Ok(s) => s,
         Err(error) => {
             warn!("Failed to convert Object into a JSON String.");
+            debug!("  >> failed to convert object into JSON String: {}", error);
             String::from("[Server Error - 500:001]")
         }
     };
@@ -28,7 +29,7 @@ pub(crate) enum MessageAction {
     CastVote,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Serialize, Deserialize)]
 pub(crate) struct ParseMessageError {
     message: String,
 }

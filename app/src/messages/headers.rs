@@ -1,5 +1,4 @@
 use crate::messages;
-use crate::messages::create_session;
 use crate::messages::{MessageAction, ParseMessageError};
 use serde::{Serialize, Deserialize};
 use log::{debug};
@@ -9,9 +8,9 @@ use uuid::Uuid;
 
 #[derive(Debug, PartialEq)]
 pub(crate) struct RequestHeader {
-    action: MessageAction,
-    session_id: String,
-    user_id: uuid::Uuid,
+    pub(crate) action: MessageAction,
+    pub(crate) session_id: String,
+    pub(crate) user_id: uuid::Uuid,
 }
 
 impl RequestHeader {
@@ -21,10 +20,6 @@ impl RequestHeader {
             session_id,
             user_id,
         };
-    }
-
-    pub(crate) fn get_action(&self) -> &MessageAction {
-        &self.action
     }
 }
 

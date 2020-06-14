@@ -2,15 +2,11 @@ use tungstenite::{WebSocket, Message};
 use std::net::TcpStream;
 use log::{warn};
 
-pub(crate) struct SocketManager<'a> {
-    socket: &'a mut WebSocket<TcpStream>
+pub(crate) struct SocketManager {
+    pub(crate) socket: WebSocket<TcpStream>
 }
 
-impl SocketManager<'_> {
-    pub(crate) fn new(web_socket: &mut WebSocket<TcpStream>) -> SocketManager {
-        return SocketManager { socket: web_socket };
-    }
-
+impl SocketManager {
     pub(crate) fn read_message(&mut self) -> Option<Message> {
         match self.socket.read_message() {
             Ok(message) => return Some(message),

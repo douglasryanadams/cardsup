@@ -19,13 +19,15 @@ use tungstenite::{accept_hdr};
 use tungstenite::handshake::server::{Request, Response};
 
 use log::{info, debug};
-use uuid::Uuid;
+use std::sync::{Arc, RwLock};
 
 fn main() {
     env_logger::init();
 
-    let sessions: HashMap<String, PokerSession> = HashMap::new();
-    let users: HashMap<Uuid, User> = HashMap::new();
+    // let mut sessions: HashMap<String, PokerSession> = HashMap::new();
+    let sessions = HashMap::new();
+    let sessions_lock = Arc::new(RwLock::new(sessions));
+    // let mut users: HashMap<Uuid, User> = HashMap::new();
 
 
     let args: Vec<String> = env::args().collect();
@@ -38,12 +40,16 @@ fn main() {
 
     let server = TcpListener::bind(format!("{}:{}", interface_ip, port)).unwrap();
 
+
     // Create a new thread ('spawn') for each connection that comes in to the server
     // started above on port 3012.
     for stream in server.incoming() {
         // TODO Clean up all the .unwrap() calls with real error handling
 
         // Starts a thread for each connection that's established
+        // TODO: Use a thread pool here to prevent potentially unlimited thread count
+        // https://doc.rust-lang.org/book/ch20-02-multithreaded.html (Example of concerns)
+        let sessions_lock = Arc::clone(&sessions_lock);
         spawn(move || {
             let callback = |request: &Request, response: Response| {
                 let headers = request.headers();
@@ -59,7 +65,9 @@ fn main() {
             };
 
             let mut websocket = accept_hdr(stream.unwrap(), callback).unwrap();
-            let mut socket_manager = SocketManager::new(&mut websocket);
+            let mut socket_manager = SocketManager {
+                socket: websocket
+            };
 
             // Main event loop that handles messages and dispatches to different business logic depending on the message type
             loop {
@@ -80,10 +88,24 @@ fn main() {
                         };
                         debug!("    header=<{:?}>;", header);
 
-                        match header.get_action() {
+                        match header.action {
                             MessageAction::CreateSession => {
-                                let create_session = messages::create_session::parse_create_session(&message, header);
+                                let create_session = match messages::create_session::parse_create_session(&message, header) {
+                                    Ok(cs) => cs,
+                                    Err(error) => {
+                                        let error_message_json = messages::to_json_string(error);
+                                        socket_manager.send_message(error_message_json);
+                                        continue;
+                                    }
+                                };
                                 debug!("    create_session=<{:?}>;", create_session);
+
+                                let mut locked_sessions = sessions_lock.write().unwrap(); // TODO Handle this error
+                                locked_sessions.insert(create_session.header.session_id, PokerSession {
+                                    session_name: create_session.session_name,
+                                    users: Vec::new(),
+                                });
+                                drop(locked_sessions);
                             }
                             MessageAction::JoinSession => {}
                             MessageAction::CloseSession => {}
