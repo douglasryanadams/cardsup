@@ -10,15 +10,15 @@ use uuid::Uuid;
 pub(crate) struct RequestHeader {
     pub(crate) action: MessageAction,
     pub(crate) session_id: String,
-    pub(crate) user_id: uuid::Uuid,
+    pub(crate) from_user_id: uuid::Uuid,
 }
 
 impl RequestHeader {
-    pub(crate) fn new(action: MessageAction, session_id: String, user_id: uuid::Uuid) -> RequestHeader {
+    pub(crate) fn new(action: MessageAction, session_id: String, from_user_id: uuid::Uuid) -> RequestHeader {
         return RequestHeader {
             action,
             session_id,
-            user_id,
+            from_user_id,
         };
     }
 }
@@ -27,12 +27,12 @@ impl RequestHeader {
 struct RequestHeaderJson {
     action: String,
     session_id: String,
-    user_id: String,
+    from_user_id: String,
 }
 
 impl fmt::Display for RequestHeaderJson {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "action=<{}>;session_id=<{}>;user_id=<{}>;", self.action, self.session_id, self.user_id)
+        write!(f, "action=<{}>;session_id=<{}>;user_id=<{}>;", self.action, self.session_id, self.from_user_id)
     }
 }
 
@@ -81,10 +81,10 @@ pub(crate) fn parse_header(message: &Message) -> Result<RequestHeader, ParseMess
 
     let header_json = wrapper.header;
 
-    let user_id: Uuid = match Uuid::parse_str(&header_json.user_id) {
+    let user_id: Uuid = match Uuid::parse_str(&header_json.from_user_id) {
         Ok(id_str) => id_str,
         Err(_) => {
-            debug!("Invalid UUID: {}", &header_json.user_id);
+            debug!("Invalid UUID: {}", &header_json.from_user_id);
             return Err(
                 ParseMessageError {
                     message: String::from("Error parsing the string provided, \
@@ -98,7 +98,7 @@ pub(crate) fn parse_header(message: &Message) -> Result<RequestHeader, ParseMess
     let mut header = RequestHeader {
         action: MessageAction::CreateSession,
         session_id: header_json.session_id,
-        user_id,
+        from_user_id: user_id,
     };
 
     header.action = match header_json.action.as_str() {
@@ -122,7 +122,7 @@ mod tests {
             header: RequestHeaderJson {
                 action: String::from("create_session"),
                 session_id: String::from("ECTO-1"),
-                user_id: user_id.unwrap_or(String::from("683d711e-fe25-443c-8102-43d4245a6884")),
+                from_user_id: user_id.unwrap_or(String::from("683d711e-fe25-443c-8102-43d4245a6884")),
             }
         };
     }

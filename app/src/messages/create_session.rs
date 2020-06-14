@@ -3,17 +3,20 @@ use crate::messages::ParseMessageError;
 use crate::messages::headers::RequestHeader;
 use tungstenite::Message;
 use serde::{Serialize, Deserialize};
+use crate::user::User;
 
 #[derive(Debug, PartialEq)]
 pub(crate) struct CreateSessionMessage {
     pub(crate) header: RequestHeader,
     pub(crate) session_name: String,
+    pub(crate) owner_name: String,
 }
 
 #[derive(Debug, PartialEq, Serialize, Deserialize)]
 struct CreateSessionMessageJson {
     // No need to parse 'header' again here
     session_name: String,
+    owner_name: String,
 }
 
 /// Parse Create Session Message
@@ -26,6 +29,7 @@ pub(crate) fn parse_create_session(message: &Message, request_header: RequestHea
     return Ok(CreateSessionMessage {
         header: request_header,
         session_name: create_session.session_name,
+        owner_name: create_session.owner_name,
     });
 }
 
@@ -37,7 +41,8 @@ mod tests {
 
     fn get_create_session_json() -> CreateSessionMessageJson {
         return CreateSessionMessageJson {
-            session_name: String::from("Test Session Name")
+            session_name: String::from("Test Session Name"),
+            owner_name: String::from("test_name"),
         };
     }
 
@@ -55,6 +60,7 @@ mod tests {
             )
             ,
             session_name: String::from("Test Session Name"),
+            owner_name: String::from("test_name"),
         };
         return expected;
     }

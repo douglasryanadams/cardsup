@@ -65,12 +65,13 @@ fn main() {
             };
 
             let mut websocket = accept_hdr(stream.unwrap(), callback).unwrap();
-            let mut socket_manager = SocketManager {
+            let mut socket_manager_lock = Arc::new(RwLock::new(SocketManager {
                 socket: websocket
-            };
+            }));
 
             // Main event loop that handles messages and dispatches to different business logic depending on the message type
             loop {
+                let mut socket_manager= socket_manager_lock.write().unwrap(); // TODO: Handle error
                 match socket_manager.read_message() {
                     Some(message) => {
                         let message_string = message.to_string();
@@ -89,6 +90,7 @@ fn main() {
                         debug!("    header=<{:?}>;", header);
 
                         match header.action {
+
                             MessageAction::CreateSession => {
                                 let create_session = match messages::create_session::parse_create_session(&message, header) {
                                     Ok(cs) => cs,
@@ -99,14 +101,21 @@ fn main() {
                                     }
                                 };
                                 debug!("    create_session=<{:?}>;", create_session);
+                                let owner = User {
+                                    user_name: create_session.owner_name,
+                                    user_id: uuid::Uuid::new_v4(),
+                                    socket_manager: Arc::clone(&socket_manager_lock),
+                                };
 
                                 let mut locked_sessions = sessions_lock.write().unwrap(); // TODO Handle this error
                                 locked_sessions.insert(create_session.header.session_id, PokerSession {
                                     session_name: create_session.session_name,
                                     users: Vec::new(),
+                                    owner,
                                 });
                                 drop(locked_sessions);
                             }
+
                             MessageAction::JoinSession => {}
                             MessageAction::CloseSession => {}
                             MessageAction::ResetVotes => {}
