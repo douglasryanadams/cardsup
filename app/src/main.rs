@@ -1,11 +1,12 @@
+mod message_manager;
+
 use std::net::TcpListener;
 use std::{process, env, thread};
 use log::{warn, info, debug};
 use tungstenite::error::Error::AlreadyClosed;
 use uuid::Uuid;
 use std::sync::{Once, RwLock, Arc};
-use std::collections::HashMap;
-use tungstenite::WebSocket;
+use crate::message_manager::MessageManager;
 
 fn main() {
     env_logger::init();
@@ -20,6 +21,7 @@ fn main() {
     let server = TcpListener::bind(format!("{}:{}", interface_ip, port))
         .expect("Failed to bind to provided IP and port!");
 
+    let message_manager = Arc::new(RwLock::new(MessageManager::new()));
 
     for stream in server.incoming() {
         thread::spawn(move || {
