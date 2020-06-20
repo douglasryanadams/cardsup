@@ -1,6 +1,7 @@
 const WebSocket = require('ws')
 const log = require('./logger')
-const SessionActions = require('./session-actions')
+const createSession = require('./session-actions/create-session')
+const joinSession = require('./session-actions/join-session')
 const Broadcast = require('./broadcast')
 
 log.info('Starting cardsup.io server!')
@@ -19,9 +20,9 @@ websocketServer.on('connection', (websocket) => {
     let response
 
     if (msg.action === 'create') {
-      response = SessionActions.createSession(msg, activeSessions, websocket)
+      response = createSession(msg, activeSessions, websocket)
     } else if (msg.action === 'join') {
-      response = SessionActions.joinSession(msg, activeSessions, websocket)
+      response = joinSession(msg, activeSessions, websocket)
       if (response.status === 'success') {
         Broadcast.broadcastUserList(activeSessions.sessionId)
       }
