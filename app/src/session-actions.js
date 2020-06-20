@@ -1,0 +1,59 @@
+const uuid = require('uuid')
+const log = require('./logger')
+
+function createSession(message, active_sessions, websocket) {
+    log.info("--> create session")
+    const sessionId = uuid.v4()
+    log.debug("  creating session: %s", sessionId)
+    const owner = {
+        id: uuid.v4(),
+        name: `${message["sessionName"]}-Owner`, // TODO: Unit test for missing name
+        sessionId: sessionId,
+        websocket: websocket,
+    }
+    active_sessions[sessionId] = {
+        id: sessionId,
+        name: message["sessionName"],
+        users: [owner],
+    }
+
+    log.info("<-- session created successfully")
+    return {
+        "type": "response",
+        "status": "success",
+        "action": "create",
+        "sessionId": sessionId
+    }
+}
+
+function joinSession(message, activeSessions, websocket) {
+    log.info("--> joining session")
+    const sessionId = message["sessionId"]
+    const session = activeSessions[sessionId]
+    if (session) {
+        const user = {
+            id: uuid.v4(),
+            name: message["username"],
+            sessionId: sessionId,
+            websocket: websocket
+        }
+        session["users"].push()
+        const response = {
+            "type": "response",
+            "status": "success",
+            "action": "join",
+            "otherUsers": session["users"]
+        }
+        return [response, user]
+    } else {
+        const response = {
+            "type": "response",
+            "status": "userError",
+            "action": "join",
+            "message": "invalid sessionId"
+        }
+        return [response, null]
+    }
+}
+
+module.exports = {createSession, joinSession}

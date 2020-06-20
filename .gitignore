@@ -8,3 +8,5 @@ target/
 logs/
 # Mac Index File
 .DS_Store
+# JavaScript Dependencies
+node_modules/
