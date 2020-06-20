@@ -1,7 +1,7 @@
 const uuid = require('uuid')
 const log = require('./logger')
 
-function createSession (message, activeSessions, websocket) {
+function createSession(message, activeSessions, websocket) {
   log.info('--> create session')
   const sessionId = uuid.v4()
   const response = {
@@ -32,34 +32,42 @@ function createSession (message, activeSessions, websocket) {
   return response
 }
 
-function joinSession (message, activeSessions, websocket) {
+function joinSession(message, activeSessions, websocket) {
   log.info('--> joining session')
-  const sessionId = message.sessionId
-  const session = activeSessions[sessionId]
-  if (session) {
-    const user = {
-      id: uuid.v4(),
-      name: message.username,
-      sessionId: sessionId,
-      websocket: websocket
-    }
-    session.users.push()
-    const response = {
-      type: 'response',
-      status: 'success',
-      action: 'joinSession',
-      otherUsers: session.users
-    }
-    return [response, user]
-  } else {
-    const response = {
-      type: 'response',
-      status: 'userError',
-      action: 'joinSession',
-      message: 'invalid sessionId'
-    }
-    return [response, null]
+  const response = {
+    type: 'response',
+    action: 'joinSession'
   }
+
+  if (!('username' in message)) {
+    response.status = 'userError'
+    response.message = "missing key, expected 'username'"
+    return response
+  }
+  if (!('sessionId' in message)) {
+    response.status = 'userError'
+    response.message = "missing key, expected 'sessionId'"
+    return response
+  }
+
+  const sessionId = message.sessionId
+  if (!(sessionId in activeSessions)) {
+    response.status = 'userError'
+    response.message = "invalid 'sessionId'"
+    return response
+  }
+
+  const session = activeSessions[sessionId]
+  const user = {
+    id: uuid.v4(),
+    name: message.username,
+    sessionId: sessionId,
+    websocket: websocket
+  }
+  session.users.push(user)
+  response.status = 'success'
+  response.allUsers = session.users
+  return response
 }
 
-module.exports = { createSession, joinSession }
+module.exports = {createSession, joinSession}

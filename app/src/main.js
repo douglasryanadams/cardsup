@@ -21,8 +21,7 @@ websocketServer.on('connection', (websocket) => {
     if (msg.action === 'create') {
       response = SessionActions.createSession(msg, activeSessions, websocket)
     } else if (msg.action === 'join') {
-      const joinSession = SessionActions.joinSession(msg, activeSessions, websocket)
-      response = joinSession[0]
+      response = SessionActions.joinSession(msg, activeSessions, websocket)
       if (response.status === 'success') {
         Broadcast.broadcastUserList(activeSessions.sessionId)
       }
