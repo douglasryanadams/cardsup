@@ -6,7 +6,7 @@ function broadcastUserList (session) {
     user.websocket.send(JSON.stringify({
       type: 'broadcast',
       action: 'updateUserList',
-      userList: session.users
+      allUsers: session.users
     }))
   }
 }

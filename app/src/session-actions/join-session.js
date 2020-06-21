@@ -1,7 +1,7 @@
 const uuid = require('uuid')
 const log = require('./../logger')
 
-function joinSession(message, activeSessions, websocket) {
+function joinSession (message, activeSessions, websocket) {
   log.info('--> joining session')
   const response = {
     type: 'response',
@@ -34,6 +34,8 @@ function joinSession(message, activeSessions, websocket) {
     websocket: websocket
   }
   session.users.push(user)
+
+  log.info('  session <%s> joined successfully', sessionId)
   response.status = 'success'
   response.allUsers = session.users
   return response

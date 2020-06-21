@@ -29,7 +29,6 @@ beforeEach(() => {
       }]
     }
   }
-
 })
 
 test('joinSession returns expected object', () => {

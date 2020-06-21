@@ -1,7 +1,7 @@
 const uuid = require('uuid')
 const log = require('./../logger')
 
-function createSession(message, activeSessions, websocket) {
+function createSession (message, activeSessions, websocket) {
   log.info('--> create session')
   const sessionId = uuid.v4()
   const response = {

@@ -3,7 +3,8 @@
   "version": "1.0.0",
   "scripts": {
     "dev": "node src/main.js",
-    "test": "jest",
+    "test:unit": "jest",
+    "test:int": "node_modules/.bin/cucumber-js",
     "lint": "npx eslint ."
   },
   "dependencies": {
@@ -12,6 +13,7 @@
     "ws": "^7.3.0"
   },
   "devDependencies": {
+    "cucumber": "^6.0.5",
     "eslint": "^7.3.0",
     "eslint-config-standard": "^14.1.1",
     "eslint-plugin-import": "^2.21.2",

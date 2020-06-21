@@ -14,7 +14,8 @@ const websocketServer = new WebSocket.Server({
 
 const activeSessions = {}
 
-websocketServer.on('connection', (websocket) => {
+websocketServer.on('connection', (websocket, request) => {
+  log.info('--> new connection from: %s', request.socket.remoteAddress)
   websocket.on('message', (message) => {
     const msg = JSON.parse(message)
     let response
@@ -35,5 +36,8 @@ websocketServer.on('connection', (websocket) => {
       }
     }
     websocket.send(JSON.stringify(response))
+  })
+  websocket.on('close', () => {
+    log.info('--> connection closed')
   })
 })

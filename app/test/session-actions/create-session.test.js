@@ -6,7 +6,7 @@ let fakeWebsocket
 
 beforeEach(() => {
   createSessionMessage = {
-    action: 'create',
+    action: 'createSession',
     sessionName: 'testSession'
   }
   // This doesn't actually need to be a mock websocket so it's
