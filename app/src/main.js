@@ -3,6 +3,7 @@ const log = require('./logger')
 const createSession = require('./session-actions/create-session')
 const joinSession = require('./session-actions/join-session')
 const Broadcast = require('./broadcast')
+const stringify = JSON.stringify
 
 log.info('Starting cardsup.io server!')
 
@@ -17,25 +18,48 @@ const activeSessions = {}
 websocketServer.on('connection', (websocket, request) => {
   log.info('--> new connection from: %s', request.socket.remoteAddress)
   websocket.on('message', (message) => {
-    const msg = JSON.parse(message)
-    let response
+    let response = {
+      type: 'response'
+    }
+    let msg;
+    try {
+      msg = JSON.parse(message)
+    } catch {
+      response.status = 'userError'
+      response.message = 'Could not parse message, please ensure it conforms to JSON format requirements.'
+      websocket.send(stringify(response))
+      return
+    }
 
-    if (msg.action === 'create') {
+    if (!('messageId' in msg)) {
+      response.status = 'userError'
+      response.message = "missing key, expected 'messageId'"
+      websocket.send(stringify(response))
+      return
+    }
+    response.messageId = msg.messageId
+    log.info('--> message received: %s', msg.messageId)
+    if (!('action' in msg)) {
+      response.status = 'userError'
+      response.message = "missing key, expected 'action'"
+      websocket.send(stringify(response))
+      return
+    }
+    response.action = msg.action
+    log.debug('  message action: %s', msg.action)
+
+    if (msg.action === 'createSession') {
       response = createSession(msg, activeSessions, websocket)
-    } else if (msg.action === 'join') {
+    } else if (msg.action === 'joinSession') {
       response = joinSession(msg, activeSessions, websocket)
       if (response.status === 'success') {
-        Broadcast.broadcastUserList(activeSessions.sessionId)
+        Broadcast.broadcastUserList(activeSessions[msg.sessionId])
       }
     } else {
-      response = {
-        type: 'response',
-        action: 'unknown',
-        status: 'userError',
-        message: "message 'action' either missing or invalid"
-      }
+      response.status = 'userError'
+      response.message = 'invalid action provided, valid actions: [createSession, joinSession]'
     }
-    websocket.send(JSON.stringify(response))
+    websocket.send(stringify(response))
   })
   websocket.on('close', () => {
     log.info('--> connection closed')

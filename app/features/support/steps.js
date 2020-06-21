@@ -1,6 +1,9 @@
-const { Given, When, Then } = require('cucumber')
+const {Given, When, Then} = require('cucumber')
 const WebSocket = require('ws')
 const wsManager = require('./websocket-manager')
+const stringify = JSON.stringify
+const parse = JSON.parse
+const uuid = require('uuid')
 
 Given('My session does not exist yet', () => {
   if (this.sessionId != null) {
@@ -8,73 +11,73 @@ Given('My session does not exist yet', () => {
   }
 })
 
+function createSession (callback) {
+  const messageId = uuid.v4()
+  const ws = wsManager.getWebsocket()
+  wsManager.setMessageId(messageId)
+  wsManager.deferCallback(messageId, callback)
+  wsManager.attachCustomCallback(messageId, (message) => {
+    wsManager.setSessionId(message.sessionId)
+  })
+  ws.send(stringify({
+    messageId: messageId,
+    action: 'createSession',
+    sessionName: 'cucumberSession'
+  }))
+}
+
 Given('A session exists', (callback) => {
   if (this.sessionId == null) {
-    const ws = wsManager.getWebsocket()
-    ws.on('connection', () => {
-      ws.send({
-        action: 'createSession',
-        sessionName: 'cucumberSession'
-      })
-      callback()
-    })
+    createSession(callback)
   }
 })
 
 When('I create a new session', (callback) => {
-  console.log(this)
-  const ws = wsManager.getWebsocket()
-  ws.on('connection', () => {
-    ws.send({
-      action: 'createSession',
-      sessionName: 'cucumberSession'
-    })
-    callback()
-  })
+  createSession(callback)
 })
 
-When('I join that session', () => {
+When('I join that session', (callback) => {
+  const messageId = uuid.v4()
   const ws = wsManager.getWebsocket()
-  ws.send({
+  wsManager.setMessageId(messageId)
+  wsManager.deferCallback(messageId, callback)
+  ws.send(stringify({
+    messageId: messageId,
     action: 'joinSession',
-    sessionId: this.sessionId,
+    sessionId: wsManager.getSessionId(),
     username: 'cucumberUser'
-  })
+  }))
 })
 
-When('Another user joins that session', () => {
-  const newWs = new WebSocket('ws://localhost:3012', 'ws', {})
-  newWs.send({
-    action: 'joinSession',
-    sessionId: this.sessionId,
-    username: 'anotherCucumberUser'
+When('Another user joins that session', (callback) => {
+  const messageId = uuid.v4()
+  const newWebsocket = new WebSocket('ws://localhost:3012', 'ws', {})
+  wsManager.setMessageId(messageId)
+  wsManager.deferCallback(messageId, callback)
+  newWebsocket.on('message', (data) => {
+    wsManager.handleMessage(data)
+    newWebsocket.terminate()
   })
-  newWs.terminate()
+  newWebsocket.on('open', () => {
+    newWebsocket.send(stringify({
+      messageId: messageId,
+      action: 'joinSession',
+      sessionId: wsManager.getSessionId(),
+      username: 'anotherCucumberUser'
+    }))
+  })
 })
 
 Then('I receive a response with status: {string}', (status) => {
-  const messages = wsManager.getWebsocketMessages()
-  let i = 0
-  while (i < messages.length) {
-    if (messages[i].status === status) break
-    i++
+  const message = wsManager.getCurrentMessage()
+  if (message.status !== status) {
+    throw new Error(`response was <${message.status}> but expected <${status}>, full message: <${stringify(message)}>`)
   }
-  if (i === messages.length) throw new Error(`no 'success' status received: ${messages}`)
-  messages.splice(i, 1)
 })
 
 Then('I receive a list of {int} users', (userCount) => {
-  const messages = wsManager.getWebsocketMessages()
-  let i = 0
-  while (i < messages.length) {
-    const message = messages[i]
-    if (message.type === 'broadcast' && message.action === 'updateUserList') break
-    i++
-  }
-  if (i === messages.length) throw new Error(`no successful 'updateUserList' broadcast found: ${messages}`)
-  const users = messages[i].allUsers
-  messages.splice(i, 1)
-  if (users.length !== userCount) {
-    throw new Error(`Expected user count <${userCount}> did not equal actual user count <%{users.length}>`)
+  const message = wsManager.getCurrentMessage()
+  if (message.allUsers.length !== userCount) {
+    throw new Error(`response included ${message.users.length} users but expected ${userCount}`)
   }
 })

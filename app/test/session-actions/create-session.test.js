@@ -7,6 +7,7 @@ let fakeWebsocket
 beforeEach(() => {
   createSessionMessage = {
     action: 'createSession',
+    messageId: 'l-m-n-o',
     sessionName: 'testSession'
   }
   // This doesn't actually need to be a mock websocket so it's
@@ -21,6 +22,7 @@ beforeEach(() => {
 test('createSession returns expected object', () => {
   expect(createSession(createSessionMessage, fakeActiveSessions, fakeWebsocket)).toEqual({
     type: 'response',
+    messageId: 'l-m-n-o',
     status: 'success',
     action: 'createSession',
     sessionId: 'a-b-c-d'
@@ -43,6 +45,7 @@ test("createSession returns an error if 'sessionName' is missing", () => {
   delete createSessionMessage.sessionName
   expect(createSession(createSessionMessage, fakeActiveSessions, fakeWebsocket)).toEqual({
     type: 'response',
+    messageId: 'l-m-n-o',
     status: 'userError',
     action: 'createSession',
     message: "missing key, expected 'sessionName'"

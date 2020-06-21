@@ -1,10 +1,12 @@
 const uuid = require('uuid')
 const log = require('./../logger')
+const {jsonReadyUserListCopy} = require('../json-util')
 
 function joinSession (message, activeSessions, websocket) {
   log.info('--> joining session')
   const response = {
     type: 'response',
+    messageId: message.messageId,
     action: 'joinSession'
   }
 
@@ -18,6 +20,7 @@ function joinSession (message, activeSessions, websocket) {
     response.message = "missing key, expected 'sessionId'"
     return response
   }
+  log.debug('  joining session: %s', message.sessionId)
 
   const sessionId = message.sessionId
   if (!(sessionId in activeSessions)) {
@@ -37,7 +40,7 @@ function joinSession (message, activeSessions, websocket) {
 
   log.info('  session <%s> joined successfully', sessionId)
   response.status = 'success'
-  response.allUsers = session.users
+  response.allUsers = jsonReadyUserListCopy(session)
   return response
 }
 

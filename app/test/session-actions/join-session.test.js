@@ -7,6 +7,7 @@ let fakeWebsocket
 beforeEach(() => {
   joinSessionMessage = {
     sessionId: 'a-b-c-d',
+    messageId: 'l-m-n-o',
     username: 'testUsername'
   }
   // This doesn't actually need to be a mock websocket so it's
@@ -34,22 +35,19 @@ beforeEach(() => {
 test('joinSession returns expected object', () => {
   expect(joinSession(joinSessionMessage, fakeActiveSessions, fakeWebsocket)).toEqual({
     type: 'response',
+    messageId: 'l-m-n-o',
     status: 'success',
     action: 'joinSession',
     allUsers: [
       {
         id: 'a-b-c-d',
         name: 'testSession-Owner',
-        sessionId: 'a-b-c-d',
-        websocket: {
-          id: 1111
-        }
+        sessionId: 'a-b-c-d'
       },
       {
         id: 'a-b-c-d',
         name: 'testUsername',
-        sessionId: 'a-b-c-d',
-        websocket: fakeWebsocket
+        sessionId: 'a-b-c-d'
       }
     ]
   })
@@ -81,6 +79,7 @@ test("joinSession returns error if 'username' is missing", () => {
   delete joinSessionMessage.username
   expect(joinSession(joinSessionMessage, fakeActiveSessions, fakeWebsocket)).toEqual({
     type: 'response',
+    messageId: 'l-m-n-o',
     action: 'joinSession',
     status: 'userError',
     message: "missing key, expected 'username'"
@@ -91,6 +90,7 @@ test("joinSession returns error if 'sessionId' is missing", () => {
   delete joinSessionMessage.sessionId
   expect(joinSession(joinSessionMessage, fakeActiveSessions, fakeWebsocket)).toEqual({
     type: 'response',
+    messageId: 'l-m-n-o',
     action: 'joinSession',
     status: 'userError',
     message: "missing key, expected 'sessionId'"
@@ -101,6 +101,7 @@ test("joinSession returns error if 'sessionId' doesn't exist", () => {
   joinSessionMessage.sessionId = 'z-y-x-w'
   expect(joinSession(joinSessionMessage, fakeActiveSessions, fakeWebsocket)).toEqual({
     type: 'response',
+    messageId: 'l-m-n-o',
     action: 'joinSession',
     status: 'userError',
     message: "invalid 'sessionId'"

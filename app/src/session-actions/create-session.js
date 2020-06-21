@@ -6,6 +6,7 @@ function createSession (message, activeSessions, websocket) {
   const sessionId = uuid.v4()
   const response = {
     type: 'response',
+    messageId: message.messageId,
     action: 'createSession'
   }
   log.debug('  creating session: %s', sessionId)

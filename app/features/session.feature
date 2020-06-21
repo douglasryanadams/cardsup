@@ -20,12 +20,7 @@ Feature: Session
   Scenario: session with multiple users
     Given A session exists
     When I join that session
-    And Another user joins that session
     Then I receive a response with status: 'success'
-    And I receive a response with status: 'success'
-    And I receive a list of 2 users
-
-    Scenario: world scope
-      Given I set something
-      When I update it
-      Then I can see the update
+    When Another user joins that session
+    Then I receive a response with status: 'success'
+    And I receive a list of 3 users
