@@ -14,6 +14,9 @@
     <link href="https://fonts.googleapis.com/css2?family=Open+Sans&display=swap" rel="stylesheet">
 
 
+    <!-- TODO: Load Locally -->
+    <script src="https://cdn.jsdelivr.net/npm/uuid@latest/dist/umd/uuidv4.min.js"></script>
+
     <link rel="stylesheet" type="text/css" href="style/dark-theme.css">
     <link rel="stylesheet" type="text/css" href="style/global.css">
     <style rel="stylesheet" type="text/css">
@@ -226,9 +229,48 @@
         </div>
     </div>
 </div>
+</body>
 <script>
     console.info("Loading ...")
+    const sessionData = JSON.parse(sessionStorage.getItem('sessionData'))
+    // TODO if sessionData not set, load from URL w/ params
+
+    const myName = sessionData.myName
+    console.debug('myName=', myName)
+    const sessionId = sessionData.sessionId
+    console.debug('sessionId=', sessionId)
+
+    const loc = window.location
+    let ws_url;
+    if (loc.protocol === "https:") {
+      ws_url = "wss:";
+    } else {
+      ws_url = "ws:";
+    }
+    ws_url += `//${loc.host}/socket/`;
+
+    const SOCKET_ADDRESS = ws_url;
+
+    console.info("Connecting to Web Socket: " + SOCKET_ADDRESS)
+    const socket = new WebSocket(SOCKET_ADDRESS)
+
+    socket.onopen = function(event) {
+      console.info('Joining Session');
+      const msg = {
+          action: 'joinSession',
+          sessionId: sessionId,
+          messageId: uuidv4(),
+          username: myName
+      }
+      console.debug("   --> ", msg);
+      socket.send(JSON.stringify(msg));
+    }
+
+    socket.onmessage = function(event) {
+      let msg = event.data
+      console.warn("TODO: Unimplemented 'onmessage'")
+      console.debug("  <-- msg=" + msg)
+    }
     console.info("Loaded")
 </script>
-</body>
 </html>

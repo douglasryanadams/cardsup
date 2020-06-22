@@ -1,198 +1,213 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1">
-    <title>Scrum Poker</title>
-    <!-- TODO: Download fonts from Google Fonts-->
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1">
+  <title>Scrum Poker</title>
+  <!-- TODO: Download fonts from Google Fonts-->
 
-    <!-- font-family: 'Lilita One', cursive; -->
-    <link href="https://fonts.googleapis.com/css2?family=Lilita+One&display=swap" rel="stylesheet">
+  <!-- font-family: 'Lilita One', cursive; -->
+  <link href="https://fonts.googleapis.com/css2?family=Lilita+One&display=swap" rel="stylesheet">
 
-    <!-- font-family: 'Open Sans', sans-serif; -->
-    <link href="https://fonts.googleapis.com/css2?family=Open+Sans&display=swap" rel="stylesheet">
-
-
-    <link rel="stylesheet" type="text/css" href="style/dark-theme.css">
-    <link rel="stylesheet" type="text/css" href="style/global.css">
-    <style rel="stylesheet" type="text/css">
-        /* Placeholder */
-        #header {
-            font-size: 2.8em;
-            font-family: 'Lilita One', Arial, sans-serif;
-            margin-bottom: 30px;
-        }
-
-        #welcome {
-            font-weight: bold;
-            font-style: italic;
-            text-align: right;
-            display: inline-block;
-        }
-
-        #welcome > #w-welcome {
-            font-size: 1.4em;
-        }
-
-        #sub-welcome {
-            font-size: 0.6em;
-            font-style: italic;
-            font-weight: lighter;
-        }
+  <!-- font-family: 'Open Sans', sans-serif; -->
+  <link href="https://fonts.googleapis.com/css2?family=Open+Sans&display=swap" rel="stylesheet">
 
 
-        .input-text {
-            margin-left: 0;
-            margin-right: 0;
-        }
+  <link rel="stylesheet" type="text/css" href="style/dark-theme.css">
+  <link rel="stylesheet" type="text/css" href="style/global.css">
+  <style rel="stylesheet" type="text/css">
+    /* Placeholder */
+    #header {
+      font-size: 2.8em;
+      font-family: 'Lilita One', Arial, sans-serif;
+      margin-bottom: 30px;
+    }
 
-        .form-element {
-            display: inline-block;
-        }
+    #welcome {
+      font-weight: bold;
+      font-style: italic;
+      text-align: right;
+      display: inline-block;
+    }
 
-        .form-row {
-            display: flex;
-            flex-direction: column;
-            flex-wrap: wrap;
-        }
+    #welcome > #w-welcome {
+      font-size: 1.4em;
+    }
 
-        .button-submit {
-            margin-top: 1em;
-            margin-left: 0;
-            margin-right: 0;
-            width: 50%;
-        }
+    #sub-welcome {
+      font-size: 0.6em;
+      font-style: italic;
+      font-weight: lighter;
+    }
 
 
-        @media (min-width: 800px) {
-            #content {
-                text-align: right;
-            }
+    .input-text {
+      margin-left: 0;
+      margin-right: 0;
+    }
 
-            #content-right {
-                display: inline-block;
-                text-align: left;
-                margin-right: 2em;
-            }
+    .form-element {
+      display: inline-block;
+    }
 
-            .input-text {
-                margin-left: 0;
-                margin-right: 0.8em;
-            }
+    .form-row {
+      display: flex;
+      flex-direction: column;
+      flex-wrap: wrap;
+    }
 
-            .form-row {
-                flex-direction: row;
-            }
+    .button-submit {
+      margin-top: 1em;
+      margin-left: 0;
+      margin-right: 0;
+      width: 50%;
+    }
 
-            .form-element {
-                align-self: center;
-            }
 
-            .vert-gap {
-                padding-top: 20px;
-            }
+    @media (min-width: 800px) {
+      #content {
+        text-align: right;
+      }
 
-            .button-submit {
-                margin-top: .5em;
-                width: auto;
-            }
+      #content-right {
+        display: inline-block;
+        text-align: left;
+        margin-right: 2em;
+      }
 
-        }
+      .input-text {
+        margin-left: 0;
+        margin-right: 0.8em;
+      }
 
-    </style>
+      .form-row {
+        flex-direction: row;
+      }
+
+      .form-element {
+        align-self: center;
+      }
+
+      .vert-gap {
+        padding-top: 20px;
+      }
+
+      .button-submit {
+        margin-top: .5em;
+        width: auto;
+      }
+
+    }
+
+  </style>
 </head>
 <body>
 <div id="body-wrapper">
-    <div id="header">
-        <div id="welcome">
-            <span id="w-welcome">W</span>ELCOME
-            <div id="sub-welcome">
-                to <span id="scrum-poker-title">Scrum Poker!</span>
-            </div>
-        </div>
+  <div id="header">
+    <div id="welcome">
+      <span id="w-welcome">W</span>ELCOME
+      <div id="sub-welcome">
+        to <span id="scrum-poker-title">Scrum Poker!</span>
+      </div>
     </div>
+  </div>
 
-    <div id="content">
-        <div id="content-right">
-            <div id="join-form-wrapper">
-                <strong>Join an existing Session:</strong>
-                <form id="join-from" action="/api/join" method="get">
-                    <div class="form-row">
-                        <input id="join-session-id"
-                               class="input-text form-element"
-                               type="text"
-                               autocomplete="session-name"
-                               name="session-id"
-                               placeholder="ECTO-1">
-                        <label for="join-session-id" class="form-element">Session ID</label>
-                    </div>
-                    <div class="form-row">
-                        <input id="join-my-name"
-                               class="input-text form-element"
-                               type="text"
-                               autocomplete="name"
-                               name="join-name"
-                               placeholder="Peter Venkman">
-                        <label for="join-my-name" class="form-element">My Name</label>
-                    </div>
-                    <div class="form-row">
-                        <button type="submit" class="button-submit" name="join-button">Join</button>
-                    </div>
-                </form>
-            </div>
-            <div class="vert-gap">&nbsp;</div>
-            <div id="create-form-wrapper">
-                <strong>Create a new Session:</strong>
-                <form id="create-from" action="/api/create" method="get">
-                    <div class="form-row">
-                        <input id="create-session-name"
-                               class="input-text form-element"
-                               type="text"
-                               autocomplete="session-name"
-                               name="session-name"
-                               placeholder="Estimation Time!">
-                        <label for="create-session-name" class="form-element">Session Name</label>
-                    </div>
-                    <div class="form-row">
+  <div id="content">
+    <div id="content-right">
+      <div id="join-form-wrapper">
+        <strong>Join an existing Session:</strong>
+        <form id="join-form">
+          <div class="form-row">
+            <input id="join-session-id"
+                   class="input-text form-element"
+                   type="text"
+                   autocomplete="session-name"
+                   name="session-id"
+                   placeholder="ECTO-1">
+            <label for="join-session-id" class="form-element">Session ID</label>
+          </div>
+          <div class="form-row">
+            <input id="join-my-name"
+                   class="input-text form-element"
+                   type="text"
+                   autocomplete="name"
+                   name="join-name"
+                   placeholder="Peter Venkman">
+            <label for="join-my-name" class="form-element">My Name</label>
+          </div>
+          <div class="form-row">
+            <button type="submit" class="button-submit" name="join-button">Join</button>
+          </div>
+        </form>
+      </div>
+      <div class="vert-gap">&nbsp;</div>
+      <div id="create-form-wrapper">
+        <strong>Create a new Session:</strong>
+        <form id="create-form">
+          <div class="form-row">
+            <input id="create-session-name"
+                   class="input-text form-element"
+                   type="text"
+                   autocomplete="session-name"
+                   name="session-name"
+                   placeholder="Estimation Time!">
+            <label for="create-session-name" class="form-element">Session Name</label>
+          </div>
+          <div class="form-row">
 
-                        <button type="submit" class="button-submit" name="create-button">Create</button>
-                    </div>
-                </form>
-            </div>
+            <button type="submit" class="button-submit" name="create-button">Create</button>
+          </div>
+        </form>
+      </div>
 
-        </div>
     </div>
+  </div>
 
-    <div id="footer">
-        <!-- TODO: Add link to license and e-mail address admin@builtonbits.com -->
-    </div>
+  <div id="footer">
+    <!-- TODO: Add link to license and e-mail address admin@builtonbits.com -->
+  </div>
 </div>
-<script>
-const loc = window.location
-let ws_url;
-if (loc.protocol === "https:") {
-    ws_url = "wss:";
-} else {
-    ws_url = "ws:";
-}
-ws_url += "//" + loc.host;
-ws_url += loc.pathname + "/socket/";
-
-const SOCKET_ADDRESS = ws_url;
-
-console.info("Connecting to Web Socket: " + SOCKET_ADDRESS)
-const socket = new WebSocket(SOCKET_ADDRESS)
-
-// Testing
-socket.onopen = function(event) {
-  let msg = "Test Message"
-  console.debug("   --> " + msg)
-  socket.send(msg)
-}
-socket.onmessage = function(event) {
-  let msg = event.data
-  console.debug("  <-- " + msg)
-}
-</script>
 </body>
+<script>
+  console.info('Loading...')
+  function getJoinForm () {
+    return document.getElementById("join-form");
+  }
+
+  function getCreateForm () {
+    return document.getElementById("create-form");
+  }
+
+  function createPokerSession (event) {
+    event.preventDefault();
+    const formElements = getCreateForm().elements;
+    const sessionName = formElements["create-session-name"].value;
+    console.debug(`->] Form Submit: sessionName=<${sessionName}>`);
+    sessionStorage.setItem('sessionData', JSON.stringify({
+      type: 'owner',
+      sessionName: sessionName
+    }))
+    window.location.href = '/scrummaster.html'
+    return false;
+  }
+
+  function joinPokerSession (event) {
+    event.preventDefault();
+    const formElements = getJoinForm().elements;
+    const sessionId = formElements["join-session-id"].value;
+    const myName = formElements["join-my-name"].value;
+    console.debug(`->] Form Submit: sessionId=<${sessionId}>;myName=<${myName}>;`);
+    sessionStorage.setItem('sessionData', JSON.stringify({
+      type: 'member',
+      sessionId: sessionId,
+      myName: myName
+    }))
+    window.location.href = '/estimate.html'
+    return false;
+  }
+
+  getCreateForm().addEventListener('submit', createPokerSession);
+  getJoinForm().addEventListener('submit', joinPokerSession);
+  console.info('loaded')
+</script>
 </html>

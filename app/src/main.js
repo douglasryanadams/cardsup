@@ -10,7 +10,7 @@ log.info('Starting cardsup.io server!')
 const websocketServer = new WebSocket.Server({
   port: 3012
 }, () => {
-  log.info('  server started')
+  log.info('  server started: 0.0.0.0:3012')
 })
 
 const activeSessions = {}

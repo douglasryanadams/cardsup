@@ -23,7 +23,6 @@ This began as a persona project to teach myself more about the Rust language and
 
 ## Web
 
-I didn't want to use any frameworks for the web app because I've used a few at work (VueJS w/ TypeScript and SASS) and sometimes I feel like they're overkill for simple cases. They're each a layer of abstraction from the documentation and native features of the browser.
+I didn't want to use any frameworks for the web app because I wanted to take this opportunity to get more familiar with all the features built in to JavaScript, HTML, and CSS these days.
 
-Since this is a hobby/passion project I wanted to take this opportunity to get more familiar with all the features built in to JavaScript, HTML, and CSS these days.
-
+There are a couple JavaScript dependencies for libraries that were infeasible to write myself, but no frameworks and no jQuery.
