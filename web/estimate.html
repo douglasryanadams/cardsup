@@ -1,22 +1,22 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1">
+  <meta charset='UTF-8'>
+  <meta name='viewport' content='width=device-width, initial-scale=1, minimum-scale=1'>
   <title>Scrum Poker - Estimate</title>
 
   <!-- TODO: Download fonts from Google Fonts-->
 
   <!-- font-family: 'Lilita One', cursive; -->
-  <link href="https://fonts.googleapis.com/css2?family=Lilita+One&display=swap" rel="stylesheet">
+  <link href='https://fonts.googleapis.com/css2?family=Lilita+One&display=swap' rel='stylesheet'>
 
   <!-- font-family: 'Open Sans', sans-serif; -->
-  <link href="https://fonts.googleapis.com/css2?family=Open+Sans&display=swap" rel="stylesheet">
+  <link href='https://fonts.googleapis.com/css2?family=Open+Sans&display=swap' rel='stylesheet'>
 
 
-  <link rel="stylesheet" type="text/css" href="style/dark-theme.css">
-  <link rel="stylesheet" type="text/css" href="style/global.css">
-  <style rel="stylesheet" type="text/css">
+  <link rel='stylesheet' type='text/css' href='style/dark-theme.css'>
+  <link rel='stylesheet' type='text/css' href='style/global.css'>
+  <style rel='stylesheet' type='text/css'>
     body {
       padding: 20px;
     }
@@ -44,8 +44,8 @@
       grid-template-columns: repeat(12, 1fr);
       grid-template-rows: auto auto;
       grid-template-areas:
-                    ". . . . ticket ticket ticket ticket . . . ."
-                    "reset reset reset show show show average average average winner winner winner";
+                    '. . . . ticket ticket ticket ticket . . . .'
+                    'reset reset reset show show show average average average winner winner winner';
       row-gap: 0.5rem;
 
       color: var(--foreground)
@@ -194,80 +194,81 @@
 </head>
 
 <body>
-<div class="body-wrapper">
-  <div class="metadata">
-    <div id="ticket-number" class="databox form-data ticket">
-      <span id="ticket-number-value" class="databox-value">ABC-1234</span>
+<div class='body-wrapper'>
+  <div class='metadata'>
+    <div id='ticket-number' class='databox form-data ticket'>
+      <span id='ticket-number-value' class='databox-value'>ABC-1234</span>
     </div>
 
-    <div class="databox action-button reset">Reset</div>
-    <div class="databox action-button show">Show</div>
+    <div class='databox action-button reset'>Reset</div>
+    <div class='databox action-button show'>Show</div>
 
-    <div class="databox info-box average">
+    <div class='databox info-box average'>
       Average:
-      <span id="average-value" class="metadata-value">6</span>
+      <span id='average-value' class='metadata-value'>6</span>
     </div>
-    <div class="databox info-box winner">
+    <div class='databox info-box winner'>
       Winner:
-      <span id="winner-value" class="metadata-value">8</span>
+      <span id='winner-value' class='metadata-value'>8</span>
     </div>
   </div>
-  <div class="card-wrapper">
-    <div class="card">1</div>
-    <div class="card">2</div>
-    <div class="card">3</div>
-    <div class="card">5</div>
+  <div class='card-wrapper'>
+    <div class='card'>1</div>
+    <div class='card'>2</div>
+    <div class='card'>3</div>
+    <div class='card'>5</div>
 
-    <div class="card">8</div>
-    <div class="card">13</div>
-    <div class="card">21</div>
-    <div class="card">34</div>
+    <div class='card'>8</div>
+    <div class='card'>13</div>
+    <div class='card'>21</div>
+    <div class='card'>34</div>
 
-    <div class="card">?</div>
-    <div class="card">!</div>
-    <div class="card">-^-</div>
-    <div class="card">-/-</div>
+    <div class='card'>?</div>
+    <div class='card'>!</div>
+    <div class='card'>-^-</div>
+    <div class='card'>-/-</div>
   </div>
-  <div class="footer">
-    <div id="session" class="session">
+  <div class='footer'>
+    <div id='session' class='session'>
       <!--            TODO: Make this clickable to copy -->
-      <span id="session-value" class="databox-value">ASLB431AS</span>
+      <span id='session-value' class='databox-value'>ASLB431AS</span>
     </div>
   </div>
 </div>
 </body>
 <!-- TODO: Load Locally -->
-<script src="https://cdn.jsdelivr.net/npm/uuid@latest/dist/umd/uuidv4.min.js"></script>
-<script src="script/socket.js"></script>
+<script src='lib/uuidv4-8.2.0.min.js'></script>
+<script src='script/socket.js'></script>
+<script src='script/messages.js'></script>
+<script src='script/users.js'></script>
+<script src='script/session.js'></script>
 
 <script>
-  console.info("Loading [estimate]...")
+  console.info('Loading [estimate]...')
   const sessionData = JSON.parse(sessionStorage.getItem('sessionData'))
   // TODO if sessionData not set, load from URL w/ params
 
-  const myName = sessionData.myName
-  console.debug('myName=', myName)
-  const sessionId = sessionData.sessionId
-  console.debug('sessionId=', sessionId)
+  user.myName = sessionData.myName
+  console.debug('  myName=', user.myName)
+  session.sessionId = sessionData.sessionId
+  console.debug('  sessionId=', user.sessionId)
 
   socket.onopen = function (event) {
     console.info('Joining Session');
     const msg = {
       action: 'joinSession',
-      sessionId: sessionId,
+      sessionId: session.sessionId,
       messageId: uuidv4(),
-      username: myName
+      username: user.myName
     }
-    console.debug("   -->", msg);
-    socket.send(JSON.stringify(msg));
+    messageSender(msg)
   }
 
   socket.onmessage = function (event) {
     let msg = JSON.parse(event.data)
-    console.warn("TODO: Unimplemented 'onmessage'")
-    console.debug("  <-- msg=", msg)
+    estimateMessageHandler(msg)
   }
-  console.info("Loaded [estimate]")
+  console.info('Loaded [estimate]')
 </script>
 
 </html>
