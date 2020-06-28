@@ -1,6 +1,9 @@
 const ERRORS = {
-  missingMessageId: new ErrorMessage(5001, 'Received message with no "messageId"!'),
-  notMyMessage: new ErrorMessage(5002, 'Received a response for a message I never sent!'),
+  userError: (errorMessage) => new ErrorMessage(5000, `Bug discovered: ${errorMessage.message}`),
+  missingMessageId: _ => new ErrorMessage(5001, 'Received message with no "messageId"!'),
+  notMyMessage: _ => new ErrorMessage(5002, 'Received a response for a message I never sent!'),
+  unknownAction: (message) => new ErrorMessage(5003, `Response received for an unknown action: ${message.action}`),
+  unknownType: (message) => new ErrorMessage(5004, `Response received for an unknown message type: ${message.type}`),
 }
 
 function ErrorMessage (id, message) {

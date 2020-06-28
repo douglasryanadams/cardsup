@@ -238,6 +238,7 @@
 </body>
 <!-- TODO: Load Locally -->
 <script src='lib/uuidv4-8.2.0.min.js'></script>
+<script src='script/errorList.js'></script>
 <script src='script/socket.js'></script>
 <script src='script/messages.js'></script>
 <script src='script/users.js'></script>
@@ -267,6 +268,10 @@
   socket.onmessage = function (event) {
     let msg = JSON.parse(event.data)
     estimateMessageHandler(msg)
+  }
+
+  function runRenderLoop() {
+    throw new Error('[runRenderLoop in estimate.html] is not implemented')
   }
   console.info('Loaded [estimate]')
 </script>

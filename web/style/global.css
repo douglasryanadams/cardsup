@@ -47,3 +47,10 @@ body {
     width: 100%;
     clear: both;
 }
+
+.error-text {
+    color: var(--secondary-red);
+    border-radius: 0.25em;
+    border: 2px solid var(--red);
+    padding: 1em 2em;
+}

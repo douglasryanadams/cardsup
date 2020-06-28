@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Admin Panel</title>
+</head>
+
+<body>
+<div id="admin-metadata">
+  <div id="admin-count">
+  </div>
+</div>
+<div id="admin-panel">
+  <h1>Session List</h1>
+  <div id="session-list">
+  </div>
+  <h1>User List</h1>
+  <div id="user-list">
+  </div>
+</div>
+</body>
+
+<script src='lib/uuidv4-8.2.0.min.js'></script>
+<script src='script/errorList.js'></script>
+<script src='script/socket.js'></script>
+<script src='script/messages.js'></script>
+<script src='script/users.js'></script>
+<script src='script/session.js'></script>
+<script>
+  let activeSessions = []
+  let highlightedUsers = []
+  let adminCount = 0
+
+  socket.onopen = function (event) {
+    console.info('Joining Session')
+    const msg = {
+      action: '__subscribeAsAdminPanel',
+      messageId: uuidv4()
+    }
+  }
+
+  socket.onmessage = function (event) {
+    const adminPanelUpdate = JSON.parse(event.data)
+    activeSessions = adminPanelUpdate.activeSessions
+    adminCount = adminPanelUpdate.adminsConnected
+    runRenderLoop()
+  }
+
+  function onSessionClick (sessionId) {
+    highlightedUsers = activeSessions[sessionId].users
+    const userList = []
+    userList.push('<ol>')
+    for (user of highlightedUsers) {
+      userList.push(`<li>${user.name}</li>`)
+    }
+    userList.push('</ol>')
+    const userListElement = document.getElementById('user-list')
+    userListElement.innerHTML = userList.join('')
+  }
+
+  function runRenderLoop () {
+    const sessionList = []
+    sessionList.push('<ol>')
+    for (const id in activeSessions) {
+      const session = activeSessions[id]
+      sessionList.push(`<li id="${id}" class="session-name">${session.name}</li>`)
+    }
+    sessionList.push('<ol>')
+    const sessionListElement = document.getElementById('session-list')
+    sessionListElement.innerHTML = sessionList.join('')
+
+    const adminCountElement = document.getElementById('admin-count')
+    adminCountElement.innerText = adminCount
+  }
+
+</script>
+</html>

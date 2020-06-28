@@ -19,7 +19,8 @@
 <body>
 <div id='body-wrapper'>
   <div id='header'>
-
+    <div id='error-wrapper'>
+    </div>
   </div>
   <div id='estimates'>
 
@@ -31,6 +32,7 @@
 </body>
 <!-- TODO: Load Locally -->
 <script src='lib/uuidv4-8.2.0.min.js'></script>
+<script src='script/errorList.js'></script>
 <script src='script/socket.js'></script>
 <script src='script/messages.js'></script>
 <script src='script/users.js'></script>
@@ -58,6 +60,32 @@
   socket.onmessage = function (event) {
     let msg = JSON.parse(event.data)
     scrumMasterMessageHandler(msg)
+  }
+
+  function renderErrors () {
+    const firstError = errorList.getFirst()
+    if (firstError === null) return false
+    const errorContent = []
+    let error = firstError
+    let count = 0
+    while (error !== null){
+      errorContent.push(
+        `<div id="error-${count++}" class="error-text">${error.message}</div>`
+      )
+      error = error.right
+    }
+    const errorWrapper = document.getElementById('error-wrapper')
+    errorWrapper.innerHTML = errorContent.join('')
+    return true
+  }
+
+  function renderUpdate() {
+
+  }
+
+  function runRenderLoop () {
+    if (renderErrors()) return
+    renderUpdate()
   }
 
   console.info('Loaded [scrum-master]')
