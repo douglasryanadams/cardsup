@@ -13,4 +13,27 @@ function broadcastUserList (session) {
   }
 }
 
-module.exports = {broadcastUserList}
+function broadcastToAdminPanel (activeSessions, adminPanels) {
+  log.info('  <-- broadcasting to admin panels')
+  const closedSockets = []
+  for (let i = 0; i < adminPanels.length; i++) {
+    const socket = adminPanels[i]
+    if (socket.readyState === socket.CLOSING || socket.readyState === socket.CLOSED) {
+      closedSockets.push(i)
+      continue
+    }
+    socket.send(JSON.stringify({
+      type: 'broadcast',
+      activeSessions: activeSessions,
+      adminCount: adminPanels.length
+    }))
+  }
+  for (let i = closedSockets.length - 1; i >= 0; i--) {
+    closedSockets.splice(i, 1)
+  }
+}
+
+module.exports = {
+  broadcastUserList,
+  broadcastToAdminPanel
+}

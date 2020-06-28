@@ -14,6 +14,7 @@ const websocketServer = new WebSocket.Server({
 })
 
 const activeSessions = {}
+const adminPanels = []
 
 websocketServer.on('connection', (websocket, request) => {
   log.info('--> new connection from: %s', request.socket.remoteAddress)
@@ -21,7 +22,7 @@ websocketServer.on('connection', (websocket, request) => {
     let response = {
       type: 'response'
     }
-    let msg;
+    let msg
     try {
       msg = JSON.parse(message)
     } catch {
@@ -33,7 +34,7 @@ websocketServer.on('connection', (websocket, request) => {
 
     if (!('messageId' in msg)) {
       response.status = 'userError'
-      response.message = "missing key, expected 'messageId'"
+      response.message = 'missing key, expected \'messageId\''
       websocket.send(stringify(response))
       return
     }
@@ -41,7 +42,7 @@ websocketServer.on('connection', (websocket, request) => {
     log.info('--> message received: %s', msg.messageId)
     if (!('action' in msg)) {
       response.status = 'userError'
-      response.message = "missing key, expected 'action'"
+      response.message = 'missing key, expected \'action\''
       websocket.send(stringify(response))
       return
     }
@@ -50,11 +51,17 @@ websocketServer.on('connection', (websocket, request) => {
 
     if (msg.action === 'createSession') {
       response = createSession(msg, activeSessions, websocket)
+      Broadcast.broadcastToAdminPanel(activeSessions, adminPanels)
     } else if (msg.action === 'joinSession') {
       response = joinSession(msg, activeSessions, websocket)
       if (response.status === 'success') {
         Broadcast.broadcastUserList(activeSessions[msg.sessionId])
+        Broadcast.broadcastToAdminPanel(activeSessions, adminPanels)
       }
+    } else if (msg.action === '__subscribeAsAdminPanel') {
+      adminPanels.push(websocket)
+      Broadcast.broadcastToAdminPanel(activeSessions, adminPanels)
+      return // No response needed
     } else {
       response.status = 'userError'
       response.message = 'invalid action provided, valid actions: [createSession, joinSession]'

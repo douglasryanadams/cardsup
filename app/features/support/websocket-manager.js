@@ -85,7 +85,6 @@ class WebsocketManager {
   getCurrentMessage () {
     return this.messagesReceived[this.messageId]
   }
-
 }
 
 const wsManager = new WebsocketManager() // Makes this a singleton, I think

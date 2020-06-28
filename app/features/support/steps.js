@@ -2,7 +2,6 @@ const {Given, When, Then} = require('cucumber')
 const WebSocket = require('ws')
 const wsManager = require('./websocket-manager')
 const stringify = JSON.stringify
-const parse = JSON.parse
 const uuid = require('uuid')
 
 Given('My session does not exist yet', () => {

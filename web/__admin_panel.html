@@ -2,13 +2,22 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Admin Panel</title>
+  <title>CardsUP - Admin Panel</title>
+
+  <!-- font-family: 'Lilita One', cursive; -->
+  <link href='https://fonts.googleapis.com/css2?family=Lilita+One&display=swap' rel='stylesheet'>
+
+  <!-- font-family: 'Open Sans', sans-serif; -->
+  <link href='https://fonts.googleapis.com/css2?family=Open+Sans&display=swap' rel='stylesheet'>
+
+
+  <link rel='stylesheet' type='text/css' href='style/dark-theme.css'>
+  <link rel='stylesheet' type='text/css' href='style/global.css'>
 </head>
 
 <body>
 <div id="admin-metadata">
-  <div id="admin-count">
-  </div>
+  Admin Count: <span id="admin-count"></span>
 </div>
 <div id="admin-panel">
   <h1>Session List</h1>
@@ -31,19 +40,22 @@
   let highlightedUsers = []
   let adminCount = 0
 
+  socket.onmessage = function (event) {
+    console.debug('  <-- admin panel message')
+    const adminPanelUpdate = JSON.parse(event.data)
+    console.debug('  adminPanelUpdate=', adminPanelUpdate)
+    activeSessions = adminPanelUpdate.activeSessions
+    adminCount = adminPanelUpdate.adminCount
+    runRenderLoop()
+  }
+
   socket.onopen = function (event) {
     console.info('Joining Session')
     const msg = {
       action: '__subscribeAsAdminPanel',
       messageId: uuidv4()
     }
-  }
-
-  socket.onmessage = function (event) {
-    const adminPanelUpdate = JSON.parse(event.data)
-    activeSessions = adminPanelUpdate.activeSessions
-    adminCount = adminPanelUpdate.adminsConnected
-    runRenderLoop()
+    messageSender(msg)
   }
 
   function onSessionClick (sessionId) {

@@ -254,6 +254,11 @@
   session.sessionId = sessionData.sessionId
   console.debug('  sessionId=', user.sessionId)
 
+  socket.onmessage = function (event) {
+    let msg = JSON.parse(event.data)
+    estimateMessageHandler(msg)
+  }
+
   socket.onopen = function (event) {
     console.info('Joining Session');
     const msg = {
@@ -263,11 +268,6 @@
       username: user.myName
     }
     messageSender(msg)
-  }
-
-  socket.onmessage = function (event) {
-    let msg = JSON.parse(event.data)
-    estimateMessageHandler(msg)
   }
 
   function runRenderLoop() {
