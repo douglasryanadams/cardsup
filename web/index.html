@@ -167,6 +167,7 @@
   </div>
 </div>
 </body>
+<script src='script/session.js'></script>
 <script>
   console.info('Loading...')
   function getJoinForm () {
@@ -182,10 +183,8 @@
     const formElements = getCreateForm().elements;
     const sessionName = formElements["create-session-name"].value;
     console.debug(`->] Form Submit: sessionName=<${sessionName}>`);
-    sessionStorage.setItem('sessionData', JSON.stringify({
-      type: 'owner',
-      sessionName: sessionName
-    }))
+    session.setType('scrum-master')
+    session.setSessionName('sessionName', sessionName)
     window.location.href = '/scrum-master.html'
     return false;
   }
@@ -196,11 +195,9 @@
     const sessionId = formElements["join-session-id"].value;
     const myName = formElements["join-my-name"].value;
     console.debug(`->] Form Submit: sessionId=<${sessionId}>;myName=<${myName}>;`);
-    sessionStorage.setItem('sessionData', JSON.stringify({
-      type: 'member',
-      sessionId: sessionId,
-      myName: myName
-    }))
+    session.setType('contributor')
+    session.setSessionId(sessionId)
+    session.setMyName(myName)
     window.location.href = '/estimate.html'
     return false;
   }

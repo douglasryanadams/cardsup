@@ -13,8 +13,7 @@ function broadcastUserList (session) {
   }
 }
 
-function broadcastToAdminPanel (activeSessions, adminPanels) {
-  log.info('  <-- broadcasting to admin panels')
+function __getPrunedSessions (activeSessions) {
   const prunedSessions = []
   for (const [id, session] of Object.entries(activeSessions)) {
     const newSession = {
@@ -31,26 +30,34 @@ function broadcastToAdminPanel (activeSessions, adminPanels) {
     prunedSessions.push(newSession)
   }
   prunedSessions.sort((a, b) => a - b)
+  return prunedSessions
+}
 
-  const closedSockets = []
-  for (let i = 0; i < adminPanels.length; i++) {
+function __removeStaleSessions (adminPanels) {
+  for (let i = adminPanels.length - 1; i >= 0; i--) {
     const socket = adminPanels[i]
     if (socket.readyState === socket.CLOSING || socket.readyState === socket.CLOSED) {
-      closedSockets.push(i)
-      continue
+      adminPanels.splice(i, 1)
     }
+  }
+}
+
+function __broadcastAdminData (prunedSessions, adminPanels) {
+  for (let i = 0; i < adminPanels.length; i++) {
+    const socket = adminPanels[i]
     socket.send(JSON.stringify({
       type: 'broadcast',
       activeSessions: prunedSessions,
-      // This will be inaccurate the first time a socket's closed because it/they have not been removed yet
       adminCount: adminPanels.length
     }))
   }
+}
 
-  // Clean up closed sockets
-  for (let i = closedSockets.length - 1; i >= 0; i--) {
-    adminPanels.splice(closedSockets[i], 1)
-  }
+function broadcastToAdminPanel (activeSessions, adminPanels) {
+  log.info('  <-- broadcasting to admin panels')
+  const prunedSessions = __getPrunedSessions(activeSessions)
+  __removeStaleSessions(adminPanels)
+  __broadcastAdminData(prunedSessions, adminPanels)
 }
 
 module.exports = {

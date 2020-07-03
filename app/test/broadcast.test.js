@@ -27,6 +27,7 @@ beforeEach(() => {
       }
     ]
   }
+
   fakeActiveSessions = {
     'a-b-c-d': {
       id: 'a-b-c-d',
@@ -51,6 +52,7 @@ beforeEach(() => {
       }]
     }
   }
+
   fakeAdminPanels = [
     {
       id: 'for-test-001',
@@ -125,8 +127,9 @@ test('', () => {
         }]
       }
     ],
-    adminCount: 3
+    adminCount: 2
   })
+
   const closedAdminPanel = fakeAdminPanels[2] // Save this first so it's available to check
   Broadcast.broadcastToAdminPanel(fakeActiveSessions, fakeAdminPanels)
   expect(fakeAdminPanels[0].send).toHaveBeenCalledWith(expectedMessage)

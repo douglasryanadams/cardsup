@@ -43,8 +43,7 @@ function messageSender (message) {
 
 function onCreateSessionResponse (message) {
   if (validResponse(message)) {
-    session.sessionId = message.sessionId
+    session.setSessionId(message.sessionId)
   }
-  session.sessionId = message.sessionId
   delete pendingMessages[message.messageId]
 }

@@ -20,12 +20,6 @@
   Admin Count: <span id="admin-count"></span>
 </div>
 <div id="admin-panel">
-  <h1>Session List</h1>
-  <div id="session-list">
-  </div>
-  <h1>User List</h1>
-  <div id="user-list">
-  </div>
 </div>
 </body>
 
@@ -45,7 +39,9 @@
     const adminPanelUpdate = JSON.parse(event.data)
     console.debug('  adminPanelUpdate=', adminPanelUpdate)
     activeSessions = adminPanelUpdate.activeSessions
+    console.debug('  activeSessions=', activeSessions)
     adminCount = adminPanelUpdate.adminCount
+    console.debug('  adminCount=', adminCount)
     runRenderLoop()
   }
 
@@ -58,28 +54,21 @@
     messageSender(msg)
   }
 
-  function onSessionClick (sessionId) {
-    highlightedUsers = activeSessions[sessionId].users
-    const userList = []
-    userList.push('<ol>')
-    for (user of highlightedUsers) {
-      userList.push(`<li>${user.name}</li>`)
-    }
-    userList.push('</ol>')
-    const userListElement = document.getElementById('user-list')
-    userListElement.innerHTML = userList.join('')
-  }
-
   function runRenderLoop () {
-    const sessionList = []
-    sessionList.push('<ol>')
-    for (const id in activeSessions) {
-      const session = activeSessions[id]
-      sessionList.push(`<li id="${id}" class="session-name">${session.name}</li>`)
+    const adminPanelHTML = []
+    console.debug('  __in runRenderLoop__ activeSessions: ', activeSessions)
+    for (const session of activeSessions) {
+      adminPanelHTML.push(`<div id="session-${session.id}" class="session-box">`)
+      adminPanelHTML.push(`<h1 class="session-name">${session.name}</h1>`)
+      adminPanelHTML.push(`<div id="session-${session.id}-userList" class="user-box">`)
+      for (const user of session.users) {
+        adminPanelHTML.push(`<div id="user-${user.id}" class="user-name">${user.name}</div>`)
+      }
+      adminPanelHTML.push(`</div>`)
+      adminPanelHTML.push('</div>')
     }
-    sessionList.push('<ol>')
-    const sessionListElement = document.getElementById('session-list')
-    sessionListElement.innerHTML = sessionList.join('')
+    const adminPanelHTMLElement = document.getElementById('admin-panel')
+    adminPanelHTMLElement.innerHTML = adminPanelHTML.join('')
 
     const adminCountElement = document.getElementById('admin-count')
     adminCountElement.innerText = adminCount

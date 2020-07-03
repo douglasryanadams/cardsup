@@ -2,6 +2,7 @@ const WebSocket = require('ws')
 const log = require('./logger')
 const createSession = require('./session-actions/create-session')
 const joinSession = require('./session-actions/join-session')
+const {rejoinSessionAsOwner} = require('./session-actions/rejoin-session')
 const Broadcast = require('./broadcast')
 const stringify = JSON.stringify
 
@@ -52,6 +53,8 @@ websocketServer.on('connection', (websocket, request) => {
     if (msg.action === 'createSession') {
       response = createSession(msg, activeSessions, websocket)
       Broadcast.broadcastToAdminPanel(activeSessions, adminPanels)
+    } else if (msg.action === 'rejoinSessionAsOwner') {
+      response = rejoinSessionAsOwner(msg, activeSessions, websocket)
     } else if (msg.action === 'joinSession') {
       response = joinSession(msg, activeSessions, websocket)
       if (response.status === 'success') {

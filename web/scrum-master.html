@@ -47,14 +47,23 @@
   console.debug('  sessionName=', session.sessionName)
 
   socket.onopen = function (event) {
-    console.info('Creating Session')
-    const msg = {
-      action: 'createSession',
-      messageId: uuidv4(),
-      sessionName: session.sessionName,
+    if (session.getSessionId() === null) {
+      console.info('Creating Session')
+      const msg = {
+        action: 'createSession',
+        messageId: uuidv4(),
+        sessionName: session.getSessionName(),
+      }
+      messageSender(msg)
+    } else {
+      console.info('Rejoining Session as the Owner')
+      const msg = {
+        action: 'rejoinSessionAsOwner',
+        messageId: uuidv4(),
+        sessionName: session.getSessionName()
+      }
+      messageSender(msg)
     }
-    console.debug('  -->', msg)
-    socket.send(JSON.stringify(msg))
   }
 
   socket.onmessage = function (event) {

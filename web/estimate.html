@@ -246,12 +246,11 @@
 
 <script>
   console.info('Loading [estimate]...')
-  const sessionData = JSON.parse(sessionStorage.getItem('sessionData'))
   // TODO if sessionData not set, load from URL w/ params
 
-  user.myName = sessionData.myName
+  user.myName = session.getMyName()
   console.debug('  myName=', user.myName)
-  session.sessionId = sessionData.sessionId
+  session.sessionId = session.getSessionId()
   console.debug('  sessionId=', user.sessionId)
 
   socket.onmessage = function (event) {
@@ -263,7 +262,7 @@
     console.info('Joining Session');
     const msg = {
       action: 'joinSession',
-      sessionId: session.sessionId,
+      sessionId: session.getSessionId(),
       messageId: uuidv4(),
       username: user.myName
     }
