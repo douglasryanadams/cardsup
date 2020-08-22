@@ -15,7 +15,7 @@ A primary design goal is to rely on as few libraries and dependencies as possibl
 
 ## Rust
 
-This began as a persona project to teach myself more about the Rust language and you'll see early commits that include Rust code for the 'app' portion of the project. I learned a lot about Rust and a lot about the complexities of sharing memory across multiple threads and objects in Rust. Ultimately I decided that:
+This began as a personal project to teach myself more about the Rust language and you'll see early commits that include Rust code for the 'app' portion of the project. I learned a lot about Rust and a lot about the complexities of sharing memory across multiple threads and objects in Rust. Ultimately I decided that:
 
 1. Rust was not the right technology for this project (which I suspected going in) and made implementation way more complicated than other languages with more forgiving memory management features
 2. To get Rust to work for the web server would have sacrificed most of what's nice about the language because a lot of objects would need to ignore/work around the "ownership" concept
